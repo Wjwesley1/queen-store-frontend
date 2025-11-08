@@ -6,8 +6,8 @@ import axios from 'axios';
 export default function Carrinho() {
   const [itens, setItens] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API_URL = 'http://localhost:5000';
-
+  const API_URL = 'https://seasons-admissions-arctic-height.trycloudflare.com';
+  
   useEffect(() => {
     axios.get(`${API_URL}/api/carrinho`)
       .then(res => {
