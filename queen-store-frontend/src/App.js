@@ -10,13 +10,29 @@ const FavoritosContext = createContext();
 export const useCarrinho = () => useContext(CarrinhoContext);
 export const useFavoritos = () => useContext(FavoritosContext);
 
-const API_URL = 'https://queen-api-p2dz.onrender.com';
+const API_URL = 'https://seasons-admissions-arctic-height.trycloudflare.com';
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'x-session-id': getSessionId()  // AQUI É O SEGREDO
+  }
+});
 
 function AppContent() {
   const [produtos, setProdutos] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
   const [favoritos, setFavoritos] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const getSessionId = () => {
+  let sessionId = localStorage.getItem('queen_session');
+  if (!sessionId) {
+    sessionId = 'web_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('queen_session', sessionId);
+  }
+  return sessionId;
+};
 
   // CARREGA PRODUTOS COM ESTOQUE REAL DO BACKEND
   useEffect(() => {
