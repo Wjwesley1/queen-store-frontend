@@ -9,7 +9,7 @@ export default function Carrinho() {
   const total = carrinho.reduce((sum, item) => sum + parseFloat(item.preco) * item.quantidade, 0).toFixed(2);
 
   const mensagem = carrinho.map(p => `${p.nome} × ${p.quantidade}`).join('\n');
-  const whatsappLink = `https://wa.me/5511999999999?text=${encodeURIComponent(
+  const whatsappLink = `https://wa.me/5531972552077?text=${encodeURIComponent(
     `Olá! Quero finalizar meu pedido:\n\n${mensagem}\n\nTotal: R$ ${total}`
   )}`;
 

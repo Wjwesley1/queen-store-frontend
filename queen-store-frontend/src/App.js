@@ -1,5 +1,6 @@
+// src/App.js — QUEEN STORE FRONTEND IMORTAL (React + Router + Context + Carrinho 24/7)
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
@@ -12,20 +13,8 @@ export const useFavoritos = () => useContext(FavoritosContext);
 
 const API_URL = 'https://seasons-admissions-arctic-height.trycloudflare.com';
 
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'x-session-id': getSessionId()  // AQUI É O SEGREDO
-  }
-});
-
-function AppContent() {
-  const [produtos, setProdutos] = useState([]);
-  const [carrinho, setCarrinho] = useState([]);
-  const [favoritos, setFavoritos] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const getSessionId = () => {
+// SESSÃO FIXA NO LOCALSTORAGE
+const getSessionId = () => {
   let sessionId = localStorage.getItem('queen_session');
   if (!sessionId) {
     sessionId = 'web_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -34,50 +23,99 @@ function AppContent() {
   return sessionId;
 };
 
-  // CARREGA PRODUTOS COM ESTOQUE REAL DO BACKEND
+const api = axios.create({
+  baseURL: API_URL,
+  headers: { 'x-session-id': getSessionId() } // CORRIGIDO: x-session-id
+});
+
+function AppContent() {
+  const [produtos, setProdutos] = useState([]);
+  const [carrinho, setCarrinho] = useState([]);
+  const [favoritos, setFavoritos] = useState([]);
+  const [categoria, setCategoria] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  // CARREGA PRODUTOS
   useEffect(() => {
-    axios.get(`${API_URL}/api/produtos`)
+    api.get('/api/produtos')
       .then(res => {
         setProdutos(res.data.map(p => ({
           ...p,
-          estoque: parseInt(p.estoque) || 0  // garante que é número
+          estoque: parseInt(p.estoque) || 0
         })));
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  // ADICIONA NO CARRINHO SÓ SE TIVER ESTOQUE
+  // CARREGA CARRINHO
+  const carregarCarrinho = () => {
+    api.get('/api/carrinho')
+      .then(res => setCarrinho(res.data))
+      .catch(() => setCarrinho([]));
+  };
+
+  useEffect(() => {
+    carregarCarrinho();
+  }, []);
+
+  // ADICIONA AO CARRINHO
   const addToCart = async (produto) => {
     if (produto.estoque <= 0) {
       showNotification("Produto esgotado!");
       return;
     }
 
-    const noCarrinho = carrinho.find(i => i.id === produto.id);
-    const totalDesejado = noCarrinho ? noCarrinho.quantidade + 1 : 1;
-
-    if (totalDesejado > produto.estoque) {
-      showNotification(`Só temos ${produto.estoque} unidade(s) em estoque!`);
-      return;
-    }
-
     try {
-      await axios.post(`${API_URL}/api/carrinho`, { produto_id: produto.id });
-      setCarrinho(prev => {
-        const existe = prev.find(p => p.id === produto.id);
-        if (existe) {
-          return prev.map(p => p.id === produto.id ? { ...p, quantidade: p.quantidade + 1 } : p);
-        }
-        return [...prev, { ...produto, quantidade: 1 }];
-      });
+      await api.post('/api/carrinho', { produto_id: produto.id });
+      carregarCarrinho();
       showNotification(`${produto.nome} adicionado!`);
     } catch (err) {
       showNotification("Erro ao adicionar");
     }
   };
 
-  const toggleFavorito = (produto) => { /* seu código de favoritos */ };
+  // REMOVE DO CARRINHO
+  const removeFromCart = async (produto_id) => {
+    try {
+      await api.post('/api/carrinho', { produto_id, quantidade: 0 });
+      carregarCarrinho();
+    } catch (err) {
+      showNotification("Erro ao remover");
+    }
+  };
 
+  // ATUALIZA QUANTIDADE
+  const updateQuantidade = async (produto_id, novaQuantidade) => {
+    if (novaQuantidade <= 0) return removeFromCart(produto_id);
+    try {
+      await api.post('/api/carrinho', { produto_id, quantidade: novaQuantidade });
+      carregarCarrinho();
+    } catch (err) {
+      showNotification("Erro ao atualizar");
+    }
+  };
+
+  // FAVORITOS
+  const toggleFavorito = (produto) => {
+    setFavoritos(prev => 
+      prev.find(p => p.id === produto.id) 
+        ? prev.filter(p => p.id !== produto.id)
+        : [...prev, produto]
+    );
+  };
+
+  const isFavorito = (id) => favoritos.some(p => p.id === id);
+
+  // FILTROS
+  const filtered = categoria === 'all' 
+    ? produtos 
+    : produtos.filter(p => p.categoria?.toLowerCase() === categoria);
+
+  const totalItens = carrinho.reduce((sum, i) => sum + i.quantidade, 0);
+  const totalValor = carrinho.reduce((sum, i) => sum + (i.preco * i.quantidade), 0).toFixed(2);
+
+  // NOTIFICAÇÃO
   const showNotification = (msg) => {
     const notif = document.createElement('div');
     notif.className = 'notification';
@@ -86,44 +124,16 @@ function AppContent() {
     setTimeout(() => notif.remove(), 3000);
   };
 
-  if (loading) return <div className="text-3xl font-bold text-primary animate-pulse text-center py-20">Carregando Queen Store...</div>;
+  // SCROLL SUAVE
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
-  return (
-    <FavoritosContext.Provider value={{ favoritos, toggleFavorito }}>
-      <CarrinhoContext.Provider value={{ carrinho, addToCart }}>
-        <div className="min-h-screen bg-white">
-
-          {/* SEUS PRODUTOS COM ESTOQUE REAL */}
-          <section id="produtos" className="py-20">
-            <div className="container mx-auto px-6">
-              <div className="products-grid">
-                {produtos
-                  .filter(p => p.estoque > 0)  // SÓ MOSTRA COM ESTOQUE
-                  .map(p => (
-                    <div key={p.id} className="product-card">
-                      <Link to={`/produto/${p.id}`}>
-                        <div className="product-image" style={{ background: `url(${p.imagem}) center/cover` }}></div>
-                      </Link>
-                      <div className="product-info p-6">
-                        <h3 className="product-title">{p.nome}</h3>
-                        <p className="text-sm text-green-600 font-bold">{p.estoque} em estoque</p>
-                        <span className="price-current">R$ {p.preco}</span>
-                        
-                        <button 
-                          onClick={() => addToCart(p)}
-                          className="btn-add-cart mt-4"
-                        >
-                          Adicionar ao Carrinho
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </section>
-
-            // ÍCONE DE CORAÇÃO SVG
-  const HeartIcon = ({ filled }) ='' (
+  // HEART ICON
+  const HeartIcon = ({ filled }) => (
     <svg 
       width="28" 
       height="28" 
@@ -131,18 +141,20 @@ function AppContent() {
       fill={filled ? "#ef4444" : "none"} 
       stroke={filled ? "#ef4444" : "#6b7280"}
       strokeWidth="2"
-      className="transition-all hover:scale-110"
+      className="transition-all hover:scale-110 cursor-pointer"
     >
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
     </svg>
   );
 
+  if (loading) return <div className="text-3xl font-bold text-primary animate-pulse text-center py-20">Carregando Queen Store...</div>;
+
   return (
     <FavoritosContext.Provider value={{ favoritos, toggleFavorito, isFavorito }}>
-      <CarrinhoContext.Provider value={{ carrinho, addToCart, updateQuantidade, removeFromCart }}>
+      <CarrinhoContext.Provider value={{ carrinho, addToCart, updateQuantidade, removeFromCart, carregarCarrinho }}>
         <div className="min-h-screen bg-white font-inter text-dark">
 
-          {/* HEADER COM CORAÇÃO SVG */}
+          {/* HEADER COM SCROLL SUAVE */}
           <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
             <div className="container mx-auto px-6 py-4 flex justify-between items-center">
               <Link to="/" className="brand">
@@ -151,9 +163,9 @@ function AppContent() {
               </Link>
 
               <nav className="hidden md:flex items-center gap-8">
-                <a href="/#produtos" className="text-gray-700 hover:text-primary font-mediumAvoid transition">Produtos</a>
-                <a href="/#avaliacoes" className="text-gray-700 hover:text-primary font-medium transition">Avaliações</a>
-                <a href="/#contato" className="text-gray-700 hover:text-primary font-medium transition">Contato</a>
+                <Link to="/" onClick={() => scrollToSection('produtos')} className="text-gray-700 hover:text-primary font-medium transition">Produtos</Link>
+                <Link to="/" onClick={() => scrollToSection('avaliacoes')} className="text-gray-700 hover:text-primary font-medium transition">Avaliações</Link>
+                <Link to="/" onClick={() => scrollToSection('contato')} className="text-gray-700 hover:text-primary font-medium transition">Contato</Link>
                 
                 <Link to="/carrinho" className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:shadow-2xl transition transform hover:scale-105">
                   Cart {totalItens} itens - R$ {totalValor}
@@ -200,15 +212,15 @@ function AppContent() {
                           </div>
                         </div>
                         <div className="flex gap-4">
-                          <a href="#produtos" className="btn-primary text-lg px-8 py-4">Ver Produtos</a>
-                          <a href="#contato" className="btn-secondary text-lg px-8 py-4">Fale Conosco</a>
+                          <button onClick={() => scrollToSection('produtos')} className="btn-primary text-lg px-8 py-4">Ver Produtos</button>
+                          <button onClick={() => scrollToSection('contato')} className="btn-secondary text-lg px-8 py-4">Fale Conosco</button>
                         </div>
                       </div>
                       <div className="hero-soap-display relative h-96 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl shadow-2xl flex items-center justify-center overflow-hidden">
                         <div className="floating-soap soap-1">ARGILA BRANCA + DOLOMITA</div>
                         <div className="floating-soap soap-2">ARGILA PRETA</div>
                         <div className="floating-soap soap-3">ERVA DOCE + CAMOMILA</div>
-                        <div className="floating-soap soap-3">AÇAFRÃO + MEL</div>
+                        <div className="floating-soap soap-4">AÇAFRÃO + MEL</div>
                       </div>
                     </div>
                   </div>
@@ -232,12 +244,12 @@ function AppContent() {
                 </section>
 
                 {/* PRODUTOS */}
-                <section id="produtos" className="products py-20 bg-white">
+                <section id="produtos" className="py-20 bg-white">
                   <div className="container mx-auto px-6">
                     <h2 className="section-title text-center mb-4">Nossa Coleção Premium</h2>
                     <p className="section-subtitle text-center mb-16">Cada sabonete é uma obra de arte</p>
                     <div className="products-grid">
-                      {filtered.map(p => (
+                      {filtered.filter(p => p.estoque > 0).map(p => (
                         <div key={p.id} className="product-card">
                           <Link to={`/produto/${p.id}`}>
                             <div className="product-image" style={{ 
@@ -249,17 +261,11 @@ function AppContent() {
                           <div className="product-info p-6">
                             <div className="product-rating mb-2">★★★★★ <span className="rating-text">(99+)</span></div>
                             <h3 className="product-title">{p.nome}</h3>
-                            <p className="product-description">Sabonete artesanal premium com ingredientes naturais.</p>
-                            <p className="product-ingredients">Ingredientes naturais • Feito à mão</p>
-                            <div className="product-pricing mb-4">
-                              <span className="price-current">R$ {p.preco}</span>
-                            </div>
-                            <div className="product-actions">
+                            <p className="text-sm text-green-600 font-bold">{p.estoque} em estoque</p>
+                            <span className="price-current">R$ {p.preco}</span>
+                            <div className="product-actions mt-4">
                               <button onClick={() => addToCart(p)} className="btn-add-cart">Adicionar</button>
-                              <button 
-                                onClick={() => toggleFavorito(p)}
-                                className="w-12 h-12 flex items-center justify-center"
-                              >
+                              <button onClick={() => toggleFavorito(p)}>
                                 <HeartIcon filled={isFavorito(p.id)} />
                               </button>
                             </div>
@@ -355,9 +361,7 @@ function AppContent() {
                           <div className="product-info p-6">
                             <h3 className="product-title">{p.nome}</h3>
                             <span className="price-current">R$ {p.preco}</span>
-                            <div className="product-actions">
-                              <button onClick={() => addToCart(p)} className="btn-add-cart">Adicionar</button>
-                            </div>
+                            <button onClick={() => addToCart(p)} className="btn-add-cart">Adicionar</button>
                           </div>
                         </div>
                       ))}
@@ -371,12 +375,12 @@ function AppContent() {
       </CarrinhoContext.Provider>
     </FavoritosContext.Provider>
   );
-        </div>
-      </CarrinhoContext.Provider>
-    </FavoritosContext.Provider>
-  );
 }
 
 export default function App() {
-  return <Router><AppContent /></Router>;
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
 }

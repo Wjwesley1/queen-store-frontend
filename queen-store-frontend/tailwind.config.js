@@ -4,15 +4,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#0f2c59', // Azul escuro original
+        primary: '#0f2c59',   // Azul escuro original
         secondary: '#4a6fa5', // Azul médio
-        accent: '#f5a623', // Amarelo mostarda
-        neutral: '#f5f5f4', // Bege claro (fundo suave)
+        accent: '#f5a623',    // Amarelo mostarda
+        neutral: '#f5f5f4',   // Bege claro
         white: '#ffffff',
       },
       fontFamily: {
-        helo: ['"Playfair Display"', 'serif'], // Fallback para Helo Paris
-        roboto: ['Roboto', 'sans-serif'], // Para textos gerais
+        helo: ['"Playfair Display"', 'serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
       animation: {
         floating: 'floating 3s ease-in-out infinite',

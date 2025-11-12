@@ -1,42 +1,158 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
+/* src/index.css — QUEEN STORE COM SUAS CORES E ANIMAÇÃO */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer components {
-  .container { @apply max-w-7xl mx-auto; }
-  .btn-primary { @apply bg-primary text-white px-8 py-4 rounded-lg font-bold hover:shadow-lg transition; }
-  .btn-secondary { @apply border-2 border-primary text-primary px-8 py-4 rounded-lg font-bold hover:bg-primary hover:text-white transition; }
-  .filter-btn { @apply px-5 py-2 rounded-full border-2 border-gray-300 text-gray-600 font-medium transition; }
-  .filter-btn.active { @apply bg-green-50 text-primary border-primary; }
-  .product-card { @apply bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition; }
-  .product-image { @apply h-64 relative bg-cover bg-center; }
-  .product-badge { @apply absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-xs font-bold; }
-  .notification { @apply fixed top-6 right-6 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl z-50 animate-slide-in; }
-  .floating-soap { @apply absolute w-20 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-xs font-bold text-primary animate-float; }
+/* FONTES */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap');
 
-  /* Animações de delay */
-  .delay-0 { animation-delay: 0s; }
-  .delay-2s { animation-delay: 2s; }
-  .delay-4s { animation-delay: 4s; }
-
-  /* Posições */
-  .soap-1 { @apply top-1/4 left-1/4 delay-0; }
-  .soap-2 { @apply top-1/2 right-1/4 delay-2s; }
-  .soap-3 { @apply bottom-1/4 left-1/3 delay-4s; }
+body {
+  @apply font-roboto bg-neutral text-primary;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
+/* CONTAINER */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
-@keyframes slide-in {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+/* BOTÕES */
+.btn-primary {
+  @apply bg-primary text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-secondary transition transform hover:scale-105;
 }
 
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-slide-in { animation: slide-in 0.3s ease; }
-.shadow-button {  box-shadow: 0 8px 25px rgba(45, 90, 39, 0.3);}
+.btn-secondary {
+  @apply bg-white text-primary border-2 border-primary font-bold py-3 px-6 rounded-full shadow-lg hover:bg-primary hover:text-white transition transform hover:scale-105;
+}
+
+.btn-add-cart {
+  @apply bg-primary text-white font-medium py-2 px-4 rounded-full text-sm hover:bg-secondary transition;
+}
+
+.filter-btn {
+  @apply px-6 py-2 rounded-full font-medium transition;
+}
+.filter-btn.active {
+  @apply bg-primary text-white;
+}
+.filter-btn:not(.active) {
+  @apply bg-white text-primary border border-primary hover:bg-primary hover:text-white;
+}
+
+/* HEADER */
+header {
+  @apply sticky top-0 z-50 bg-white shadow-md border-b border-gray-200;
+}
+.brand h1 {
+  @apply text-3xl md:text-4xl font-helo text-primary;
+}
+.tagline {
+  @apply text-xs uppercase tracking-widest text-secondary font-roboto;
+}
+
+/* HERO */
+.hero {
+  @apply py-20 bg-gradient-to-br from-neutral to-white relative overflow-hidden;
+}
+.hero h2 {
+  @apply text-5xl md:text-6xl font-helo text-primary mb-6 leading-tight;
+}
+.hero p {
+  @apply text-lg text-secondary mb-8 font-roboto;
+}
+.hero-soap-display {
+  @apply relative h-96 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-2xl;
+}
+.floating-soap {
+  @apply absolute text-white font-bold text-sm px-4 py-2 rounded-full shadow-lg animate-floating;
+}
+.soap-1 { @apply bg-primary top-8 left-8; animation-delay: 0s; }
+.soap-2 { @apply bg-secondary top-20 right-12; animation-delay: 1s; }
+.soap-3 { @apply bg-accent bottom-16 left-16; animation-delay: 2s; }
+.soap-4 { @apply bg-primary/80 bottom-8 right-20; animation-delay: 3s; }
+
+/* PRODUTOS */
+.products-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8;
+}
+.product-card {
+  @apply bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-2 border border-gray-100;
+}
+.product-image {
+  @apply h-64 bg-gray-100 relative;
+}
+.product-badge {
+  @apply absolute top-4 left-4 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full;
+}
+.product-info {
+  @apply p-6;
+}
+.product-title {
+  @apply text-xl font-helo text-primary mb-2;
+}
+.price-current {
+  @apply text-2xl font-bold text-primary;
+}
+.product-actions {
+  @apply flex justify-between items-center mt-4;
+}
+.product-rating {
+  @apply text-yellow-500 text-sm;
+}
+.rating-text {
+  @apply text-secondary text-xs;
+}
+
+/* AVALIAÇÕES */
+.reviews-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+}
+.review-card {
+  @apply bg-white p-6 rounded-2xl shadow-lg border border-gray-100;
+}
+.review-header {
+  @apply flex items-center gap-4 mb-4;
+}
+.reviewer-avatar {
+  @apply w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg;
+}
+.review-text {
+  @apply text-secondary italic font-roboto;
+}
+
+/* CONTATO */
+.form-container {
+  @apply bg-white p-8 rounded-2xl shadow-lg border border-gray-200;
+}
+.form-group {
+  @apply mb-4;
+}
+.form-group input,
+.form-group textarea {
+  @apply w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition font-roboto;
+}
+.form-group textarea {
+  @apply h-32 resize-none;
+}
+
+/* NOTIFICAÇÃO */
+.notification {
+  @apply fixed bottom-8 right-8 bg-primary text-white px-6 py-4 rounded-full shadow-2xl font-bold z-50;
+  animation: bounce 0.5s ease-out;
+}
+
+/* LOADING */
+.loading {
+  @apply text-center py-20 text-3xl font-helo text-primary animate-pulse;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .hero h2 {
+    @apply text-4xl;
+  }
+  .products-grid {
+    @apply grid-cols-1 sm:grid-cols-2;
+  }
+}
