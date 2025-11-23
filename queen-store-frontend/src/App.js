@@ -25,7 +25,7 @@ const getSessionId = () => {
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: { 'x-session-id': getSessionId() } // CORRIGIDO: x-session-id
+  headers: { 'x-session-id': getSessionId() }
 });
 
 function AppContent() {
@@ -59,21 +59,31 @@ function AppContent() {
     carregarCarrinho();
   }, []);
 
-  // ADICIONA AO CARRINHO
-  const addToCart = async (produto) => {
-    if (produto.estoque <= 0) {
-      showNotification("Produto esgotado!");
-      return;
-    }
+  // ADICIONA AO CARRINHO — CORRIGIDO 100%
+const addToCart = async (produto) => {
+  if (produto.estoque <= 0) {
+    showNotification("Produto esgotado!");
+    return;
+  }
 
-    try {
-      await api.post('/api/carrinho', { produto_id: produto.id });
+  try {
+    // MANDA O produto_id CORRETAMENTE
+    const response = await api.post('/api/carrinho', { 
+      produto_id: produto.id || produto.produto_id,
+      quantidade: 1 
+    });
+    
+    if (response.data.sucesso) {
       carregarCarrinho();
       showNotification(`${produto.nome} adicionado!`);
-    } catch (err) {
-      showNotification("Erro ao adicionar");
+    } else {
+      showNotification(response.data.erro || "Erro ao adicionar");
     }
-  };
+  } catch (err) {
+    console.error('ERRO ADICIONAR:', err.response?.data || err.message);
+    showNotification("Erro ao adicionar — tente novamente");
+  }
+};
 
   // REMOVE DO CARRINHO
   const removeFromCart = async (produto_id) => {
@@ -127,22 +137,13 @@ function AppContent() {
   // SCROLL SUAVE
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (element) element.scrollIntoView({ behavior: 'smooth' });
   };
 
   // HEART ICON
   const HeartIcon = ({ filled }) => (
-    <svg 
-      width="28" 
-      height="28" 
-      viewBox="0 0 24 24" 
-      fill={filled ? "#ef4444" : "none"} 
-      stroke={filled ? "#ef4444" : "#6b7280"}
-      strokeWidth="2"
-      className="transition-all hover:scale-110 cursor-pointer"
-    >
+    <svg width="28" height="28" viewBox="0 0 24 24" fill={filled ? "#ef4444" : "none"} 
+         stroke={filled ? "#ef4444" : "#6b7280"} strokeWidth="2" className="transition-all hover:scale-110 cursor-pointer">
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
     </svg>
   );
@@ -243,14 +244,32 @@ function AppContent() {
                   </div>
                 </section>
 
-                {/* PRODUTOS */}
+                {/* PRODUTOS COM CONTADOR DE ESTOQUE AO VIVO */}
                 <section id="produtos" className="py-20 bg-white">
                   <div className="container mx-auto px-6">
                     <h2 className="section-title text-center mb-4">Nossa Coleção Premium</h2>
                     <p className="section-subtitle text-center mb-16">Cada sabonete é uma obra de arte</p>
                     <div className="products-grid">
                       {filtered.filter(p => p.estoque > 0).map(p => (
-                        <div key={p.id} className="product-card">
+                        <div key={p.id} className="product-card relative">
+
+                          {/* CONTADOR DE ESTOQUE AO VIVO */}
+                          {p.estoque <= 5 && (
+                            <div className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse z-10">
+                              APENAS {p.estoque} RESTANTES!
+                            </div>
+                          )}
+                          {p.estoque > 5 && p.estoque <= 10 && (
+                            <div className="absolute top-4 right-4 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                              {p.estoque} em estoque
+                            </div>
+                          )}
+                          {p.estoque > 10 && (
+                            <div className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+                              {p.estoque} disponíveis
+                            </div>
+                          )}
+
                           <Link to={`/produto/${p.id}`}>
                             <div className="product-image" style={{ 
                               background: p.imagem ? `url(${p.imagem}) center/cover` : 'linear-gradient(135deg, #e6e6fa, #dda0dd)'
