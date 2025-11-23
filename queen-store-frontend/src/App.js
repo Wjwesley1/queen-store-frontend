@@ -1,4 +1,4 @@
-// src/App.js — QUEEN STORE FRONTEND IMORTAL (React + Router + Context + Carrinho 24/7)
+// src/App.js — QUEEN STORE FRONTEND 100% COMPLETO, RESPONSIVO E IMORTAL
 import React, { useEffect, useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -13,7 +13,7 @@ const FavoritosContext = createContext();
 export const useCarrinho = () => useContext(CarrinhoContext);
 export const useFavoritos = () => useContext(FavoritosContext);
 
-// ==================== CONFIG API ====================
+// ==================== API CONFIG ====================
 const API_URL = 'https://queen-store-api.onrender.com';
 
 const getSessionId = () => {
@@ -38,7 +38,7 @@ function AppContent() {
   const [categoria, setCategoria] = useState('all');
   const [loading, setLoading] = useState(true);
 
-  // ==================== CARREGA PRODUTOS ====================
+  // CARREGA PRODUTOS
   useEffect(() => {
     api.get('/api/produtos')
       .then(res => {
@@ -51,18 +51,16 @@ function AppContent() {
       .catch(() => setLoading(false));
   }, []);
 
-  // ==================== CARREGA CARRINHO ====================
+  // CARREGA CARRINHO
   const carregarCarrinho = () => {
     api.get('/api/carrinho')
       .then(res => setCarrinho(res.data))
       .catch(() => setCarrinho([]));
   };
 
-  useEffect(() => {
-    carregarCarrinho();
-  }, []);
+  useEffect(() => { carregarCarrinho(); }, []);
 
-  // ==================== ADICIONAR AO CARRINHO ====================
+  // ADICIONAR AO CARRINHO
   const addToCart = async (produto) => {
     if (produto.estoque <= 0) {
       showNotification("Produto esgotado!");
@@ -70,45 +68,29 @@ function AppContent() {
     }
 
     try {
-      const response = await api.post('/api/carrinho', {
-        produto_id: produto.id || produto.produto_id,
+      await api.post('/api/carrinho', {
+        produto_id: produto.id,
         quantidade: 1
       });
-
-      if (response.data.sucesso) {
-      } else {
-        showNotification(response.data.erro || "Erro ao adicionar");
-      }
+      carregarCarrinho();
+      showNotification(`${produto.nome} adicionado!`);
     } catch (err) {
-      console.error('ERRO ADICIONAR:', err.response?.data || err.message);
-      showNotification("Erro ao adicionar — tente novamente");
+      showNotification("Erro ao adicionar");
     }
   };
 
-  // ==================== REMOVER DO CARRINHO ====================
+  // REMOVER DO CARRINHO
   const removeFromCart = async (produto_id) => {
     try {
       await api.delete(`/api/carrinho/${produto_id}`);
       carregarCarrinho();
       showNotification("Removido do carrinho!");
     } catch (err) {
-      console.error("Erro ao remover:", err);
       showNotification("Erro ao remover");
     }
   };
 
-  // ==================== ATUALIZAR QUANTIDADE ====================
-  const updateQuantidade = async (produto_id, novaQuantidade) => {
-    if (novaQuantidade <= 0) return removeFromCart(produto_id);
-    try {
-      await api.post('/api/carrinho', { produto_id, quantidade: novaQuantidade });
-      carregarCarrinho();
-    } catch (err) {
-      showNotification("Erro ao atualizar");
-    }
-  };
-
-  // ==================== FAVORITOS ====================
+  // FAVORITOS
   const toggleFavorito = (produto) => {
     setFavoritos(prev =>
       prev.find(p => p.id === produto.id)
@@ -119,7 +101,7 @@ function AppContent() {
 
   const isFavorito = (id) => favoritos.some(p => p.id === id);
 
-  // ==================== FILTROS E CÁLCULOS ====================
+  // FILTROS E CÁLCULOS
   const filtered = categoria === 'all'
     ? produtos
     : produtos.filter(p => p.categoria?.toLowerCase() === categoria);
@@ -127,21 +109,19 @@ function AppContent() {
   const totalItens = carrinho.reduce((sum, i) => sum + i.quantidade, 0);
   const totalValor = carrinho.reduce((sum, i) => sum + (i.preco * i.quantidade), 0).toFixed(2);
 
-  // ==================== NOTIFICAÇÃO ====================
+  // NOTIFICAÇÃO
   const showNotification = (msg) => {
     const notif = document.createElement('div');
-    notif.className = 'notification';
+    notif.className = 'fixed top-4 right-4 bg-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-pulse font-bold';
     notif.textContent = msg;
     document.body.appendChild(notif);
     setTimeout(() => notif.remove(), 3000);
   };
 
-  // ==================== SCROLL SUAVE ====================
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // ==================== HEART ICON ====================
   const HeartIcon = ({ filled }) => (
     <svg width="28" height="28" viewBox="0 0 24 24" fill={filled ? "#ef4444" : "none"}
          stroke={filled ? "#ef4444" : "#6b7280"} strokeWidth="2"
@@ -150,7 +130,6 @@ function AppContent() {
     </svg>
   );
 
-  // ==================== LOADING ====================
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
@@ -159,29 +138,25 @@ function AppContent() {
     );
   }
 
-  // ==================== RENDER PRINCIPAL ====================
   return (
     <FavoritosContext.Provider value={{ favoritos, toggleFavorito, isFavorito }}>
-      <CarrinhoContext.Provider value={{ carrinho, addToCart, updateQuantidade, removeFromCart, carregarCarrinho }}>
-        <div className="min-h-screen bg-white font-inter text-dark">
+      <CarrinhoContext.Provider value={{ carrinho, addToCart, removeFromCart, carregarCarrinho }}>
+        <div className="min-h-screen bg-white font-sans">
 
           {/* HEADER */}
           <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
-            <div className="container mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
               <Link to="/" className="text-center sm:text-left">
                 <h1 className="text-4xl font-bold text-primary">Queen</h1>
                 <p className="text-xs text-gray-500 uppercase tracking-widest">Se cuidar é reinar.</p>
               </Link>
-
-              <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-8">
-                <button onClick={() => scrollToSection('produtos')} className="text-gray-700 hover:text-primary font-medium">Produtos</button>
-                <button onClick={() => scrollToSection('avaliacoes')} className="text-gray-700 hover:text-primary font-medium">Avaliações</button>
-                <button onClick={() => scrollToSection('contato')} className="text-gray-700 hover:text-primary font-medium">Contato</button>
-                
-                <Link to="/carrinho" className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:shadow-2xl transition transform hover:scale-105">
-                  Carrinho {totalItens} itens - R$ {totalValor}
+              <nav className="flex flex-wrap justify-center items-center gap-4">
+                <button onClick={() => scrollToSection('produtos')} className="font-medium hover:text-primary">Produtos</button>
+                <button onClick={() => scrollToSection('avaliacoes')} className="font-medium hover:text-primary">Avaliações</button>
+                <button onClick={() => scrollToSection('contato')} className="font-medium hover:text-primary">Contato</button>
+                <Link to="/carrinho" className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:scale-105 transition">
+                  Carrinho {totalItens} - R$ {totalValor}
                 </Link>
-
                 <Link to="/favoritos" className="relative">
                   <HeartIcon filled={favoritos.length > 0} />
                   {favoritos.length > 0 && (
@@ -194,24 +169,29 @@ function AppContent() {
             </div>
           </header>
 
-          {/* ROTAS */}
           <Routes>
             <Route path="/" element={
               <>
-                {/* HERO, FILTROS, PRODUTOS, AVALIAÇÕES, CONTATO, FOOTER */}
-                {/* (mantive tudo igual, só organizei melhor) */}
-                <section className="hero py-20 bg-gradient-to-br from-sky-50 to-sky-100">
-                  {/* ... todo o hero ... */}
+                {/* HERO */}
+                <section className="hero py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+                  <div className="container mx-auto px-6 text-center">
+                    <h2 className="text-5xl md:text-7xl font-bold mb-6">Cuidado Natural para Sua Pele</h2>
+                    <p className="text-xl text-gray-600 mb-10">Sabonetes artesanais premium • 100% naturais • Feitos com amor</p>
+                    <button onClick={() => scrollToSection('produtos')} className="bg-primary text-white px-10 py-5 rounded-full text-xl font-bold hover:scale-110 transition shadow-2xl">
+                      Ver Produtos
+                    </button>
+                  </div>
                 </section>
 
-                <section className="filters py-8 bg-gray-50 border-b">
+                {/* FILTROS */}
+                <section className="py-8 bg-gray-100 border-b">
                   <div className="container mx-auto px-6">
                     <div className="flex justify-center gap-4 flex-wrap">
                       {['all', 'Geleia de banho', 'Sabonete'].map(cat => (
                         <button
                           key={cat}
                           onClick={() => setCategoria(cat)}
-                          className={`px-6 py-3 rounded-full font-medium transition ${categoria === cat ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                          className={`px-8 py-3 rounded-full font-bold transition ${categoria === cat ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
                         >
                           {cat === 'all' ? 'Todos' : cat}
                         </button>
@@ -220,25 +200,24 @@ function AppContent() {
                   </div>
                 </section>
 
+                {/* PRODUTOS */}
                 <section id="produtos" className="py-20 bg-white">
                   <div className="container mx-auto px-6">
-                    <h2 className="text-5xl font-bold text-center mb-4">Nossa Coleção Premium</h2>
-                    <p className="text-center text-gray-600 mb-16">Cada sabonete é uma obra de arte</p>
-
+                    <h2 className="text-5xl font-bold text-center mb-16">Nossa Coleção Premium</h2>
                     <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                       {filtered.map(produto => (
-                        <div key={produto.id} className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all hover:scale-105">
+                        <div key={produto.id} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all">
                           <Link to={`/produto/${produto.id}`}>
-                            <div className="aspect-square bg-cover bg-center" style={{ backgroundImage: `url(${produto.imagem || '/placeholder.jpg'})` }} />
-                            {produto.badge && <span className="absolute top-3 left-3 bg-primary text-white px-4 py-1 rounded-full text-sm font-bold">{produto.badge}</span>}
-                            {produto.estoque <= 5 && produto.estoque > 0 && <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">Poucas unidades!</span>}
-                            {produto.estoque === 0 && (
-                              <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
-                                <span className="text-white font-bold text-2xl">ESGOTADO</span>
-                              </div>
-                            )}
+                            <div className="aspect-square bg-cover bg-center relative" style={{ backgroundImage: `url(${produto.imagem || '/placeholder.jpg'})` }}>
+                              {produto.badge && <span className="absolute top-3 left-3 bg-primary text-white px-4 py-1 rounded-full text-sm font-bold">{produto.badge}</span>}
+                              {produto.estoque <= 5 && produto.estoque > 0 && <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">Poucas unidades!</span>}
+                              {produto.estoque === 0 && (
+                                <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+                                  <span className="text-white font-bold text-2xl">ESGOTADO</span>
+                                </div>
+                              )}
+                            </div>
                           </Link>
-
                           <div className="p-4">
                             <h3 className="font-bold text-sm line-clamp-2 mb-2">{produto.nome}</h3>
                             <p className="text-primary font-bold text-xl mb-3">R$ {produto.preco}</p>
@@ -256,7 +235,50 @@ function AppContent() {
                   </div>
                 </section>
 
-                {/* AVALIAÇÕES, CONTATO E FOOTER (mantidos) */}
+                {/* AVALIAÇÕES */}
+                <section id="avaliacoes" className="py-20 bg-gray-50">
+                  <div className="container mx-auto px-6 text-center">
+                    <h2 className="text-5xl font-bold mb-12">O Que Nossas Rainhas Dizem</h2>
+                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                      {[
+                        { nome: "Maria Silva", texto: "Melhor sabonete da vida! Minha pele nunca esteve tão macia." },
+                        { nome: "Ana Costa", texto: "Cheiro maravilhoso que dura o dia todo. Já virei cliente fiel!" },
+                        { nome: "Juliana Lima", texto: "Entrega rápida e produto de altíssima qualidade. Recomendo!" }
+                      ].map((r, i) => (
+                        <div key={i} className="bg-white p-8 rounded-2xl shadow-xl">
+                          <div className="text-yellow-500 text-2xl mb-4">★★★★★</div>
+                          <p className="text-gray-700 italic mb-6">"{r.texto}"</p>
+                          <p className="font-bold text-primary">{r.nome}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+
+                {/* CONTATO */}
+                <section id="contato" className="py-20 bg-white">
+                  <div className="container mx-auto px-6 text-center">
+                    <h2 className="text-5xl font-bold mb-8">Fale com a Rainha</h2>
+                    <p className="text-xl text-gray-600 mb-12">Dúvidas? Pedidos personalizados? Estamos aqui pra te atender como você merece.</p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-8 max-w-2xl mx-auto">
+                      <a href="https://wa.me/5511999999999" className="bg-green-500 text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
+                        WhatsApp
+                      </a>
+                      <a href="mailto:contato@queenstore.com.br" className="bg-primary text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
+                        Email
+                      </a>
+                    </div>
+                  </div>
+                </section>
+
+                {/* FOOTER */}
+                <footer className="bg-gray-900 text-white py-12">
+                  <div className="container mx-auto px-6 text-center">
+                    <h3 className="text-4xl font-bold mb-4">Queen Store</h3>
+                    <p className="text-gray-400 mb-6">Se cuidar é reinar.</p>
+                    <p className="text-sm">© 2025 Queen Store • Todos os direitos reservados • Feito com amor no Brasil</p>
+                  </div>
+                </footer>
               </>
             } />
 
@@ -265,13 +287,13 @@ function AppContent() {
             <Route path="/favoritos" element={
               <div className="min-h-screen bg-gray-50 py-20">
                 <div className="container mx-auto px-6">
-                  <h1 className="text-5xl font-bold text-primary text-center mb-12">Seus Favoritos</h1>
+                  <h1 className="text-5xl font-bold text-primary text-center mb-16">Seus Favoritos</h1>
                   {favoritos.length === 0 ? (
-                    <p className="text-center text-2xl text-gray-600">Você ainda não tem favoritos</p>
+                    <p className="text-center text-2xl text-gray-600">Você ainda não salvou nenhum favorito</p>
                   ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                       {favoritos.map(p => (
-                        <div key={p.id} className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <div key={p.id} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition">
                           <Link to={`/produto/${p.id}`}>
                             <div className="aspect-square bg-cover bg-center" style={{ backgroundImage: `url(${p.imagem})` }} />
                           </Link>
@@ -296,7 +318,6 @@ function AppContent() {
   );
 }
 
-// ==================== APP ROOT ====================
 export default function App() {
   return (
     <Router>
