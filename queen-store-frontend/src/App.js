@@ -85,15 +85,17 @@ const addToCart = async (produto) => {
   }
 };
 
-  // REMOVE DO CARRINHO
-  const removeFromCart = async (produto_id) => {
-    try {
-      await api.post('/api/carrinho', { produto_id, quantidade: 0 });
-      carregarCarrinho();
-    } catch (err) {
-      showNotification("Erro ao remover");
-    }
-  };
+  // REMOVE DO CARRINHO — AGORA COM DELETE DE VERDADE
+const removeFromCart = async (produto_id) => {
+  try {
+    await api.delete(`/api/carrinho/${produto_id}`);
+    carregarCarrinho();
+    showNotification("Removido do carrinho!");
+  } catch (err) {
+    console.error(err);
+    showNotification("Erro ao remover");
+  }
+};
 
   // ATUALIZA QUANTIDADE
   const updateQuantidade = async (produto_id, novaQuantidade) => {
