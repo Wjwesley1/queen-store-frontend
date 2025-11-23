@@ -231,7 +231,7 @@ const addToCart = async (produto) => {
                 <section className="filters py-8 bg-gray-50 border-b">
                   <div className="container mx-auto px-6">
                     <div className="flex justify-center gap-4 flex-wrap">
-                      {['all', 'relaxante', 'energizante', 'hidratante', 'premium'].map(cat => (
+                      {['all', 'Geleia de banho', 'Sabonete'].map(cat => (
                         <button
                           key={cat}
                           onClick={() => setCategoria(cat)}
