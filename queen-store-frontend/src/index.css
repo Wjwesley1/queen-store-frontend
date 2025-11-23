@@ -166,3 +166,51 @@ header {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
+
+/* FIX PRA CELULAR */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Grid de produtos perfeita no celular */
+.grid-produtos {
+  @apply grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4;
+}
+
+/* Cards no celular */
+.card-produto {
+  @apply relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105;
+}
+
+/* Carrinho no celular */
+.carrinho-mobile {
+  @apply fixed bottom-0 left-0 right-0 bg-white border-t-4 border-primary p-4 z-50;
+}
+
+/* Botão flutuante do WhatsApp */
+.whatsapp-float {
+  @apply fixed bottom-20 right-4 bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-3xl z-50 hover:scale-110 transition-all;
+}
+
+/* Ajustes pra tela pequena */
+@media (max-width: 640px) {
+  .container {
+    @apply px-3;
+  }
+  
+  h1 {
+    @apply text-3xl;
+  }
+  
+  .btn-add-cart {
+    @apply text-lg py-4;
+  }
+  
+  .product-badge {
+    @apply text-xs px-3 py-1;
+  }
+}

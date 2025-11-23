@@ -35,6 +35,7 @@ function AppContent() {
   const [categoria, setCategoria] = useState('all');
   const [loading, setLoading] = useState(true);
 
+  
   // CARREGA PRODUTOS
   useEffect(() => {
     api.get('/api/produtos')
@@ -251,49 +252,49 @@ const removeFromCart = async (produto_id) => {
                   <div className="container mx-auto px-6">
                     <h2 className="section-title text-center mb-4">Nossa Coleção Premium</h2>
                     <p className="section-subtitle text-center mb-16">Cada sabonete é uma obra de arte</p>
-                    <div className="products-grid">
-                      {filtered.filter(p => p.estoque > 0).map(p => (
-                        <div key={p.id} className="product-card relative">
-
-                          {/* CONTADOR DE ESTOQUE AO VIVO */}
-                          {p.estoque <= 5 && (
-                            <div className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse z-10">
-                              APENAS {p.estoque} RESTANTES!
-                            </div>
-                          )}
-                          {p.estoque > 5 && p.estoque <= 10 && (
-                            <div className="absolute top-4 right-4 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
-                              {p.estoque} em estoque
-                            </div>
-                          )}
-                          {p.estoque > 10 && (
-                            <div className="absolute top-4 right-4 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full z-10">
-                              {p.estoque} disponíveis
-                            </div>
-                          )}
-
-                          <Link to={`/produto/${p.id}`}>
-                            <div className="product-image" style={{ 
-                              background: p.imagem ? `url(${p.imagem}) center/cover` : 'linear-gradient(135deg, #e6e6fa, #dda0dd)'
-                            }}>
-                              {p.badge && <div className="product-badge">{p.badge}</div>}
-                            </div>
-                          </Link>
-                          <div className="product-info p-6">
-                            <div className="product-rating mb-2">★★★★★ <span className="rating-text">(99+)</span></div>
-                            <h3 className="product-title">{p.nome}</h3>
-                            <p className="text-sm text-green-600 font-bold">{p.estoque} em estoque</p>
-                            <span className="price-current">R$ {p.preco}</span>
-                            <div className="product-actions mt-4">
-                              <button onClick={() => addToCart(p)} className="btn-add-cart">Adicionar</button>
-                              <button onClick={() => toggleFavorito(p)}>
-                                <HeartIcon filled={isFavorito(p.id)} />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                   <div className="grid-produtos">
+  {produtos.map(produto => (
+    <div key={produto.id} className="card-produto">
+      <Link to={`/produto/${produto.id}`}>
+        <div 
+          className="aspect-square bg-cover bg-center"
+          style={{ backgroundImage: `url(${produto.imagem || '/placeholder.jpg'})` }}
+        />
+        {produto.badge && (
+          <span className="product-badge absolute top-2 left-2 bg-primary text-white">
+            {produto.badge}
+          </span>
+        )}
+        {produto.estoque <= 5 && produto.estoque > 0 && (
+          <span className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+            Poucas unidades!
+          </span>
+        )}
+        {produto.estoque === 0 && (
+          <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
+            <span className="text-white font-bold text-xl">ESGOTADO</span>
+          </div>
+        )}
+      </Link>
+      
+      <div className="p-3">
+        <h3 className="font-bold text-sm line-clamp-2">{produto.nome}</h3>
+        <p className="text-primary font-bold text-lg">R$ {produto.preco}</p>
+        <button
+          onClick={() => addToCart(produto)}
+          disabled={produto.estoque === 0}
+          className={`mt-2 w-full py-2 rounded-full text-sm font-bold transition-all ${
+            produto.estoque === 0 
+              ? 'bg-gray-400 text-gray-700' 
+              : 'bg-primary text-white hover:bg-pink-700'
+          }`}
+        >
+          {produto.estoque === 0 ? 'Esgotado' : 'Adicionar'}
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
                   </div>
                 </section>
 
