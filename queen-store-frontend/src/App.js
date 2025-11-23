@@ -11,7 +11,7 @@ const FavoritosContext = createContext();
 export const useCarrinho = () => useContext(CarrinhoContext);
 export const useFavoritos = () => useContext(FavoritosContext);
 
-const API_URL = 'https://seasons-admissions-arctic-height.trycloudflare.com';
+const API_URL = 'https://queen-store-api.onrender.com/';
 
 // SESSÃO FIXA NO LOCALSTORAGE
 const getSessionId = () => {
