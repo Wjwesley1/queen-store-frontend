@@ -1,6 +1,7 @@
 // src/App.js — QUEEN STORE FRONTEND 100% COMPLETO, RESPONSIVO E IMORTAL
+
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 import Carrinho from './pages/Carrinho';
@@ -37,6 +38,7 @@ function AppContent() {
   const [favoritos, setFavoritos] = useState([]);
   const [categoria, setCategoria] = useState('all');
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   // CARREGA PRODUTOS
   useEffect(() => {
@@ -59,6 +61,19 @@ function AppContent() {
   };
 
   useEffect(() => { carregarCarrinho(); }, []);
+
+  // SCROLL AUTOMÁTICO QUANDO TEM # NA URL (ex: /#produtos, /#contato)
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.substring(1); // remove o #
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+    }
+  }, [location]);
 
   // ADICIONAR AO CARRINHO
   const addToCart = async (produto) => {
@@ -112,14 +127,10 @@ function AppContent() {
   // NOTIFICAÇÃO
   const showNotification = (msg) => {
     const notif = document.createElement('div');
-    notif.className = 'fixed top-4 right-4 bg-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-pulse font-bold';
+    notif.className = 'fixed top-4 right-4 bg-primary text-white px-6 py-4 rounded-xl shadow-2xl z-50 animate-pulse font-bold text-2xl';
     notif.textContent = msg;
     document.body.appendChild(notif);
     setTimeout(() => notif.remove(), 3000);
-  };
-
-  const scrollToSection = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const HeartIcon = ({ filled }) => (
@@ -143,20 +154,26 @@ function AppContent() {
       <CarrinhoContext.Provider value={{ carrinho, addToCart, removeFromCart, carregarCarrinho }}>
         <div className="min-h-screen bg-white font-sans">
 
-          {/* HEADER */}
+          {/* HEADER FIXADO — FUNCIONA EM TODAS AS PÁGINAS */}
           <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
             <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
               <Link to="/" className="text-center sm:text-left">
                 <h1 className="text-4xl font-bold text-primary">Queen</h1>
                 <p className="text-xs text-gray-500 uppercase tracking-widest">Se cuidar é reinar.</p>
               </Link>
-              <nav className="flex flex-wrap justify-center items-center gap-4">
-                <button onClick={() => scrollToSection('produtos')} className="font-medium hover:text-primary">Produtos</button>
-                <button onClick={() => scrollToSection('avaliacoes')} className="font-medium hover:text-primary">Avaliações</button>
-                <button onClick={() => scrollToSection('contato')} className="font-medium hover:text-primary">Contato</button>
-                <Link to="/carrinho" className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:scale-105 transition">
+
+              <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+                <Link to="/#produtos" className="font-medium hover:text-primary transition">Produtos</Link>
+                <Link to="/#avaliacoes" className="font-medium hover:text-primary transition">Avaliações</Link>
+                <Link to="/#contato" className="font-medium hover:text-primary transition">Contato</Link>
+
+                <Link 
+                  to="/carrinho" 
+                  className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:scale-105 transition"
+                >
                   Carrinho {totalItens} - R$ {totalValor}
                 </Link>
+
                 <Link to="/favoritos" className="relative">
                   <HeartIcon filled={favoritos.length > 0} />
                   {favoritos.length > 0 && (
@@ -172,16 +189,46 @@ function AppContent() {
           <Routes>
             <Route path="/" element={
               <>
-                {/* HERO */}
-                <section className="hero py-20 bg-gradient-to-br from-purple-50 to-pink-50">
-                  <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-5xl md:text-7xl font-bold mb-6">Cuidado Natural para Sua Pele</h2>
-                    <p className="text-xl text-gray-600 mb-10">Sabonetes artesanais premium • 100% naturais • Feitos com amor</p>
-                    <button onClick={() => scrollToSection('produtos')} className="bg-primary text-white px-10 py-5 rounded-full text-xl font-bold hover:scale-110 transition shadow-2xl">
-                      Ver Produtos
-                    </button>
-                  </div>
-                </section>
+               {/* HERO COM VÍDEO DE FUNDO — A RAINHA NASCEU!!! */}
+<section className="relative h-screen flex items-center justify-center overflow-hidden">
+  {/* VÍDEO DE FUNDO */}
+  <video
+    autoPlay
+    loop
+    muted
+    playsInline
+    className="absolute w-full h-full object-cover"
+  >
+    <source src="/videos/fundo-hero.mp4" type="video/mp4" />
+    Seu navegador não suporta vídeo.
+  </video>
+
+  {/* OVERLAY ROXO/ROSA COM GRADIENTE */}
+  <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/70 to-transparent"></div>
+
+  {/* CONTEÚDO DO HERO */}
+  <div className="relative z-10 container mx-auto px-6 text-center text-white">
+    <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight animate-fade-in">
+      Cuidado Natural<br />para Sua Pele
+    </h2>
+    <p className="text-xl md:text-2xl mb-10 opacity-90">
+      Sabonetes artesanais • 100% naturais • Feitos com amor e poder
+    </p>
+    <Link
+      to="/#produtos"
+      className="inline-block bg-white text-primary px-12 py-6 rounded-full text-2xl font-bold hover:scale-110 transition shadow-2xl hover:shadow-purple-500/50"
+    >
+      Conheça a Coleção
+    </Link>
+  </div>
+
+  {/* SCROLL INDICATOR */}
+  <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <svg className="w-10 h-10 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
+  </div>
+</section>
 
                 {/* FILTROS */}
                 <section className="py-8 bg-gray-100 border-b">
