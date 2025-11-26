@@ -38,12 +38,14 @@ export default function Carrinho() {
               <div className="text-xl font-bold text-primary">
                 R$ {(item.preco * item.quantidade).toFixed(2)}
               </div>
-              <button 
-                onClick={() => removeFromCart(item.id)}
-                className="w-12 h-12 bg-red-500 text-white rounded-full hover:bg-red-600 transition text-2xl font-bold"
-              >
-                X
-              </button>
+              <button
+  onClick={() => {
+    removeFromCart(item.produto_id);
+  }}
+  className="text-red-600 hover:text-red-800 font-bold"
+>
+  Remover
+</button>
             </div>
           ))}
 

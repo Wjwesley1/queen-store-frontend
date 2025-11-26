@@ -4,6 +4,7 @@ import React, { useEffect, useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import LoadingQueen from './components/LoadingQueen'; // ADICIONA O IMPORT NO TOPO
 
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
@@ -142,13 +143,9 @@ function AppContent() {
     </svg>
   );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-4xl font-bold text-primary animate-pulse">Carregando Queen Store...</div>
-      </div>
-    );
-  }
+if (loading) {
+  return <LoadingQueen />;
+}
 
   return (
     <FavoritosContext.Provider value={{ favoritos, toggleFavorito, isFavorito }}>
