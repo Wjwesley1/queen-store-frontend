@@ -370,6 +370,7 @@ export default function App() {
   return (
     <Router>
       <AppContent />
+      <SpeedInsights apiKey="vck_3jIZl0d8gS3CGvUi1rDhQ2ifKf0AH5b3rOO7e7MuOjLiUTcBEH1Z2hWlERE" />
     </Router>
   );
 }
