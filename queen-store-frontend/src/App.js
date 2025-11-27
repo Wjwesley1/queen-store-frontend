@@ -12,7 +12,6 @@ import ProdutoDetalhe from './pages/ProdutoDetalhe';
 // ==================== CONTEXTS ====================
 const CarrinhoContext = createContext();
 const FavoritosContext = createContext();
-const [categorias, setCategorias] = useState([]);
 
 export const useCarrinho = () => useContext(CarrinhoContext);
 export const useFavoritos = () => useContext(FavoritosContext);
@@ -42,6 +41,7 @@ function AppContent() {
   const [categoria, setCategoria] = useState('all');
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [categorias, setCategorias] = useState([]);
 
   // CARREGA PRODUTOS
   useEffect(() => {
@@ -77,7 +77,7 @@ function AppContent() {
       }, 300);
     }
   }, [location]);
-  
+
   // CARREGA CATEGORIAS DO BANCO
 useEffect(() => {
   api.get('/api/categorias')
