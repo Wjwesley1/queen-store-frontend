@@ -95,23 +95,23 @@ useEffect(() => {
 }, []);
 
   // ADICIONAR AO CARRINHO
-  const addToCart = async (produto) => {
-    if (produto.estoque <= 0) {
-      showNotification("Produto esgotado!");
-      return;
-    }
+  const addToCart = async (produto, quantidade = 1) => {
+  if (produto.estoque < quantidade) {
+    showNotification("Estoque insuficiente!");
+    return;
+  }
 
-    try {
-      await api.post('/api/carrinho', {
-        produto_id: produto.id,
-        quantidade: 1
-      });
-      carregarCarrinho();
-      showNotification(`${produto.nome} adicionado!`);
-    } catch (err) {
-      showNotification("Erro ao adicionar");
-    }
-  };
+  try {
+    await api.post('/api/carrinho', {
+      produto_id: produto.id,
+      quantidade
+    });
+    carregarCarrinho();
+    showNotification(`\( {quantidade}x \){produto.nome} adicionado(s)!`);
+  } catch (err) {
+    showNotification("Erro ao adicionar");
+  }
+};
 
   // REMOVER DO CARRINHO
   const removeFromCart = async (produto_id) => {
@@ -296,12 +296,12 @@ if (loading) {
                             <h3 className="font-bold text-sm line-clamp-2 mb-2">{produto.nome}</h3>
                             <p className="text-primary font-bold text-xl mb-3">R$ {produto.preco}</p>
                             <button
-                              onClick={() => addToCart(produto)}
-                              disabled={produto.estoque === 0}
-                              className={`w-full py-3 rounded-full font-bold transition ${produto.estoque === 0 ? 'bg-gray-400 text-gray-700' : 'bg-primary text-white hover:bg-pink-700'}`}
-                            >
-                              {produto.estoque === 0 ? 'Esgotado' : 'Adicionar'}
-                            </button>
+  onClick={() => addToCart(produto, 1)}
+  disabled={produto.estoque === 0}
+  className="w-full py-3 rounded-full font-bold bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] transition"
+>
+  Adicionar ao Carrinho
+</button>
                           </div>
                         </div>
                       ))}
