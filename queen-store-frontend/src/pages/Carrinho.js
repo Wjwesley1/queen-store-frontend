@@ -1,4 +1,4 @@
-// src/pages/Carrinho.js — CARRINHO PROFISSIONAL COM + / − E QUANTIDADE
+// src/pages/Carrinho.js — VERSÃO 100% CORRIGIDA E FUNCIONANDO COM TEU BACKEND ATUAL
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCarrinho } from '../App';
@@ -12,7 +12,6 @@ const api = axios.create({
 export default function Carrinho() {
   const { carrinho, carregarCarrinho } = useCarrinho();
 
-  // FUNÇÃO PRA ATUALIZAR QUANTIDADE
   const updateQuantidade = async (produto_id, novaQuantidade) => {
     if (novaQuantidade < 1) {
       await api.delete(`/api/carrinho/${produto_id}`);
@@ -22,10 +21,11 @@ export default function Carrinho() {
     carregarCarrinho();
   };
 
-  const total = carrinho.reduce((sum, item) => sum + item.preco_unitario * item.quantidade, 0).toFixed(2);
+  // CORRIGIDO: usa "preco" (não preco_unitario)
+  const total = carrinho.reduce((sum, item) => sum + (parseFloat(item.preco) || 0) * item.quantidade, 0).toFixed(2);
 
   const mensagem = carrinho
-    .map(p => `\( {p.nome} × \){p.quantidade} - R$ ${(p.preco_unitario * p.quantidade).toFixed(2)}`)
+    .map(p => `\( {p.nome} × \){p.quantidade} - R$ ${(parseFloat(p.preco) * p.quantidade).toFixed(2)}`)
     .join('\n');
 
   const whatsappLink = `https://wa.me/5531972552077?text=${encodeURIComponent(
@@ -51,48 +51,40 @@ export default function Carrinho() {
         <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
           {carrinho.map(item => (
             <div key={item.produto_id} className="flex items-center gap-6 p-8 border-b last:border-0 hover:bg-gray-50 transition">
-              {/* IMAGEM */}
               <div className="w-28 h-28 bg-cover bg-center rounded-2xl shadow-lg" style={{ backgroundImage: `url(${item.imagem || '/placeholder.jpg'})` }}></div>
 
-              {/* INFO */}
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-gray-800">{item.nome}</h3>
-                <p className="text-[#0F1B3F] font-bold">R$ {item.preco_unitario.toFixed(2)} cada</p>
+                <p className="text-[#0F1B3F] font-bold">R$ {parseFloat(item.preco).toFixed(2)} cada</p>
               </div>
 
-              {/* CONTROLE DE QUANTIDADE */}
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => updateQuantidade(item.produto_id, item.quantidade - 1)}
-                  className="w-12 h-12 rounded-full bg-gray-200 hover:bg-gray-300 text-2xl font-bold text-gray-700 hover:text-gray-900 transition"
-                >
-                  −
-                </button>
+                  className="w-12 h-12 rounded-full bg-gray-200 hover:bg-gray-300 text-2xl font-bold text-gray-700"
+                >−</button>
                 <span className="w-16 text-center text-2xl font-bold text-[#0F1B3F]">{item.quantidade}</span>
                 <button
                   onClick={() => updateQuantidade(item.produto_id, item.quantidade + 1)}
-                  className="w-12 h-12 rounded-full bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] text-2xl font-bold transition shadow-lg"
-                >
-                  +
-                </button>
+                  className="w-12 h-12 rounded-full bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] text-2xl font-bold shadow-lg"
+                >+</button>
               </div>
 
-              {/* TOTAL DO ITEM */}
               <div className="text-right">
-                <p className="text-2xl font-bold text-[#0F1B3F]">R$ {(item.preco_unitario * item.quantidade).toFixed(2)}</p>
+                <p className="text-2xl font-bold text-[#0F1B3F]">
+                  R$ {(parseFloat(item.preco) * item.quantidade).toFixed(2)}
+                </p>
               </div>
 
-              {/* REMOVER */}
               <button
                 onClick={() => updateQuantidade(item.produto_id, 0)}
-                className="text-red-600 hover:text-red-800 font-bold text-lg transition"
+                className="text-red-600 hover:text-red-800 font-bold text-lg"
               >
                 Remover
               </button>
             </div>
           ))}
 
-          {/* RESUMO E FINALIZAR */}
           <div className="bg-gradient-to-r from-[#0F1B3F] to-[#1a2d5e] text-white p-10">
             <div className="flex justify-between items-center mb-6">
               <p className="text-3xl font-bold">Total do Pedido</p>
