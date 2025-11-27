@@ -79,15 +79,18 @@ function AppContent() {
   }, [location]);
 
   // CARREGA CATEGORIAS DO BANCO
+// CARREGA CATEGORIAS DO BANCO (AGORA IGNORA MAIÚSCULA/MINÚSCULA)
 useEffect(() => {
   api.get('/api/categorias')
     .then(res => {
-      setCategorias(res.data);
+      // Transforma tudo pra título bonito (primeira letra maiúscula)
+      const formatadas = res.data.map(cat => 
+        cat.trim().toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+      );
+      setCategorias(formatadas);
     })
-    .catch(err => {
-      console.error("Erro ao carregar categorias:", err);
-      // Fallback caso o backend falhe
-      setCategorias(['Geleia de banho', 'Sabonete']);
+    .catch(() => {
+      setCategorias(['Geleia De Banho', 'Sabonete']);
     });
 }, []);
 
@@ -133,10 +136,11 @@ useEffect(() => {
   const isFavorito = (id) => favoritos.some(p => p.id === id);
 
   // FILTROS E CÁLCULOS
-  const filtered = categoria === 'all'
-    ? produtos
-    : produtos.filter(p => p.categoria?.toLowerCase() === categoria);
-
+ const filtered = categoria === 'all'
+  ? produtos
+  : produtos.filter(p => 
+      p.categoria?.trim().toLowerCase() === categoria.toLowerCase()
+    );
   const totalItens = carrinho.reduce((sum, i) => sum + i.quantidade, 0);
   const totalValor = carrinho.reduce((sum, i) => sum + (i.preco * i.quantidade), 0).toFixed(2);
 
@@ -256,14 +260,16 @@ if (loading) {
 
       {/* CATEGORIAS DO BANCO */}
       {categorias.map(cat => (
-        <button
-          key={cat}
-          onClick={() => setCategoria(cat)}
-          className={`px-8 py-3 rounded-full font-bold transition ${categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
-        >
-          {cat}
-        </button>
-      ))}
+  <button
+    key={cat}
+    onClick={() => setCategoria(cat)}  // guarda com maiúscula certa
+    className={`px-8 py-3 rounded-full font-bold transition ${
+      categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'
+    }`}
+  >
+    {cat}
+  </button>
+))}
     </div>
   </div>
 </section>
