@@ -1,35 +1,33 @@
-// src/components/LoadingQueen.jsx
+// src/components/LoadingQueen.jsx — COROA OFICIAL DA RAINHA
 import React from 'react';
 
 export default function LoadingQueen() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-      <div className="relative">
-        {/* COROA GRANDE GIRANDO */}
+      <div className="text-center">
+        {/* COROA OFICIAL EM AZUL ROYAL #0F1B3F */}
         <svg
-          className="w-32 h-32 animate-spin-slow"
-          viewBox="0 0 24 24"
+          className="w-32 h-32 mx-auto animate-spin-slow drop-shadow-2xl"
+          viewBox="0 0 100 100"
           fill="none"
-          stroke="#d946ef"
-          strokeWidth="1.5"
+          stroke="#0F1B3F"
+          strokeWidth="6"
         >
-          <path d="M12 2L14.09 8.26L20.18 8.27L15.54 11.97L17.45 18.02L12 15.27L6.55 18.02L8.46 11.97L3.82 8.27L9.91 8.26L12 2Z" />
+          <path d="M50 10 L62 38 L92 42 L68 62 L74 90 L50 75 L26 90 L32 62 L8 42 L38 38 Z" />
+          <circle cx="50" cy="30" r="6" fill="#0F1B3F" />
+          <circle cx="35" cy="45" r="5" fill="#0F1B3F" />
+          <circle cx="65" cy="45" r="5" fill="#0F1B3F" />
         </svg>
 
-        {/* PARTÍCULAS DE BRILHO AO REDOR */}
-        <div className="absolute inset-0 flex items-center justify-center animate-pulse">
-          <div className="w-40 h-40 rounded-full border-4 border-pink-300 opacity-30 animate-ping"></div>
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-48 h-48 rounded-full border-4 border-purple-400 opacity-20 animate-ping delay-300"></div>
+        {/* BRILHO DISCRETO */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-48 h-48 rounded-full border-4 border-[#0F1B3F]/20 animate-ping"></div>
         </div>
 
-        {/* TEXTO "A RAINHA ESTÁ CHEGANDO" */}
-        <div className="mt-10 text-center">
-          <p className="text-2xl font-bold text-primary animate-fade-in-up">
-            A Rainha está chegando...
-          </p>
-        </div>
+        {/* TEXTO COM A COR OFICIAL */}
+        <p className="mt-10 text-3xl font-bold text-[#0F1B3F] animate-fade-in-up tracking-wider">
+          Bem vindo à Queen Store ...
+        </p>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import React, { useEffect, useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { SpeedInsights } from "@vercel/speed-insights/react"
-import LoadingQueen from './components/LoadingQueen'; // ADICIONA O IMPORT NO TOPO
+import LoadingQueen from './components/LoadingQueen'; 
 
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
@@ -12,6 +12,7 @@ import ProdutoDetalhe from './pages/ProdutoDetalhe';
 // ==================== CONTEXTS ====================
 const CarrinhoContext = createContext();
 const FavoritosContext = createContext();
+const [categorias, setCategorias] = useState([]);
 
 export const useCarrinho = () => useContext(CarrinhoContext);
 export const useFavoritos = () => useContext(FavoritosContext);
@@ -76,6 +77,19 @@ function AppContent() {
       }, 300);
     }
   }, [location]);
+  
+  // CARREGA CATEGORIAS DO BANCO
+useEffect(() => {
+  api.get('/api/categorias')
+    .then(res => {
+      setCategorias(res.data);
+    })
+    .catch(err => {
+      console.error("Erro ao carregar categorias:", err);
+      // Fallback caso o backend falhe
+      setCategorias(['Geleia de banho', 'Sabonete']);
+    });
+}, []);
 
   // ADICIONAR AO CARRINHO
   const addToCart = async (produto) => {
@@ -228,22 +242,31 @@ if (loading) {
   </div>
 </section>
 
-                {/* FILTROS */}
-                <section className="py-8 bg-gray-100 border-b">
-                  <div className="container mx-auto px-6">
-                    <div className="flex justify-center gap-4 flex-wrap">
-                      {['all', 'Geleia de banho', 'Sabonete'].map(cat => (
-                        <button
-                          key={cat}
-                          onClick={() => setCategoria(cat)}
-                          className={`px-8 py-3 rounded-full font-bold transition ${categoria === cat ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
-                        >
-                          {cat === 'all' ? 'Todos' : cat}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </section>
+                {/* FILTROS DINÂMICOS — VEM DO BANCO! */}
+<section className="py-8 bg-gray-100 border-b">
+  <div className="container mx-auto px-6">
+    <div className="flex justify-center gap-4 flex-wrap">
+      {/* BOTÃO TODOS */}
+      <button
+        onClick={() => setCategoria('all')}
+        className={`px-8 py-3 rounded-full font-bold transition ${categoria === 'all' ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+      >
+        Todos
+      </button>
+
+      {/* CATEGORIAS DO BANCO */}
+      {categorias.map(cat => (
+        <button
+          key={cat}
+          onClick={() => setCategoria(cat)}
+          className={`px-8 py-3 rounded-full font-bold transition ${categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
 
                 {/* PRODUTOS */}
                 <section id="produtos" className="py-20 bg-white">
