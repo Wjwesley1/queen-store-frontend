@@ -9,6 +9,7 @@ const API_URL = 'https://queen-store-api.onrender.com';
 export default function ProdutoDetalhe() {
   const { id } = useParams();
   const [produto, setProduto] = useState(null);
+  );
   const [loading, setLoading] = useState(true);
   const [fotoAtiva, setFotoAtiva] = useState(0); // ← CORRIGIDO: estava quebrado antes
   const { addToCart } = useCarrinho();
@@ -30,6 +31,7 @@ export default function ProdutoDetalhe() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-4xl font-bold text-[#0F1B3F] animate-pulse">Carregando rainha...</div>
+        <div className="text-4xl font-bold text-[#0F1B3F] animate-pulse">Carregando rainha...</div>
       </div>
     );
   }
@@ -37,6 +39,8 @@ export default function ProdutoDetalhe() {
   if (!produto) {
     return (
       <div className="min-h-screen bg-gray-50 py-20 text-center">
+        <h2 className="text-5xl font-bold text-red-600 mb-8">Produto não encontrado</h2>
+        <Link to="/" className="text-[#0F1B3F] text-xl hover:underline font-bold">← Voltar para loja</Link>
         <h2 className="text-5xl font-bold text-red-600 mb-8">Produto não encontrado</h2>
         <Link to="/" className="text-[#0F1B3F] text-xl hover:underline font-bold">← Voltar para loja</Link>
       </div>
@@ -53,11 +57,14 @@ export default function ProdutoDetalhe() {
   return (
     <div className="min-h-screen bg-gray-50 py-16">
       <div className="container mx-auto px-6 max-w-7xl">
+      <div className="container mx-auto px-6 max-w-7xl">
 
+        <Link to="/" className="inline-flex items-center text-[#0F1B3F] font-bold text-lg hover:underline mb-10">
         <Link to="/" className="inline-flex items-center text-[#0F1B3F] font-bold text-lg hover:underline mb-10">
           ← Voltar para loja
         </Link>
 
+        <div className="grid lg:grid-cols-2 gap-12 bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-12 bg-white rounded-3xl shadow-2xl overflow-hidden">
 
           {/* GALERIA */}
@@ -122,6 +129,9 @@ export default function ProdutoDetalhe() {
               <div className="mb-8 bg-gray-50 p-6 rounded-2xl">
                 <h3 className="font-bold text-lg mb-3 text-[#0F1B3F]">Ingredientes principais:</h3>
                 <p className="text-gray-700 italic">{produto.ingredientes}</p>
+              <div className="mb-8 bg-gray-50 p-6 rounded-2xl">
+                <h3 className="font-bold text-lg mb-3 text-[#0F1B3F]">Ingredientes principais:</h3>
+                <p className="text-gray-700 italic">{produto.ingredientes}</p>
               </div>
             )}
 
@@ -129,7 +139,10 @@ export default function ProdutoDetalhe() {
               onClick={() => !estoqueEsgotado && addToCart(produto)}
               disabled={estoqueEsgotado}
               className={`w-full py-6 rounded-2xl text-2xl font-bold transition-all transform hover:scale-105 shadow-2xl ${
+              className={`w-full py-6 rounded-2xl text-2xl font-bold transition-all transform hover:scale-105 shadow-2xl ${
                 estoqueEsgotado
+                  ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                  : 'bg-[#0F1B3F] text-white hover:bg-[#1a2d5e]'
                   ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
                   : 'bg-[#0F1B3F] text-white hover:bg-[#1a2d5e]'
               }`}
@@ -137,6 +150,7 @@ export default function ProdutoDetalhe() {
               {estoqueEsgotado ? 'Produto Esgotado' : 'Adicionar ao Carrinho'}
             </button>
 
+            <p className="text-center text-gray-600 mt-8 text-lg">
             <p className="text-center text-gray-600 mt-8 text-lg">
               Frete grátis acima de R$ 150 • Entrega em todo Brasil
             </p>
