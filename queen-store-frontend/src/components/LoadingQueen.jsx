@@ -1,34 +1,41 @@
-// src/components/LoadingQueen.jsx — COROA OFICIAL DA RAINHA
+// src/components/LoadingScreen.jsx — BARRA FLUÍDA COM BRILHO INFINITO
 import React from 'react';
 
-export default function LoadingQueen() {
+export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
-      <div className="text-center">
-        {/* COROA OFICIAL EM AZUL ROYAL #0F1B3F */}
-        <svg
-          className="w-32 h-32 mx-auto animate-spin-slow drop-shadow-2xl"
-          viewBox="0 0 100 100"
-          fill="none"
-          stroke="#0F1B3F"
-          strokeWidth="6"
-        >
-          <path d="M50 10 L62 38 L92 42 L68 62 L74 90 L50 75 L26 90 L32 62 L8 42 L38 38 Z" />
-          <circle cx="50" cy="30" r="6" fill="#0F1B3F" />
-          <circle cx="35" cy="45" r="5" fill="#0F1B3F" />
-          <circle cx="65" cy="45" r="5" fill="#0F1B3F" />
-        </svg>
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-br from-[#0F1B3F] via-[#1a2d5e] to-[#0F1B3F]">
 
-        {/* BRILHO DISCRETO */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-48 h-48 rounded-full border-4 border-[#0F1B3F]/20 animate-ping"></div>
+      {/* TÍTULO */}
+      <h1 className="text-5xl lg:text-7xl font-bold text-white tracking-wider mb-16 animate-pulse">
+        Bem vindo à Queen Store
+      </h1>
+
+      {/* BARRA ULTRA FLUÍDA COM BRILHO */}
+      <div className="relative w-80 lg:w-96 max-w-full px-8">
+        <div className="h-3 bg-white/10 rounded-full overflow-hidden shadow-2xl backdrop-blur-sm">
+          
+          {/* BARRA DE PROGRESSO INFINITA */}
+          <div className="h-full w-full bg-gradient-to-r from-transparent via-yellow-400 to-transparent animate-shimmer"></div>
+          
+          {/* BRILHO POR CIMA (EFEITO LUXO) */}
+          <div className="absolute inset-0 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shine"></div>
         </div>
-
-        {/* TEXTO COM A COR OFICIAL */}
-        <p className="mt-10 text-3xl font-bold text-[#0F1B3F] animate-fade-in-up tracking-wider">
-          Bem vindo à Queen Store ...
-        </p>
       </div>
+
+      {/* PONTINHOS DISCRETOS */}
+      <div className="flex gap-4 mt-12">
+        {[0, 1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="w-4 h-4 bg-yellow-400/60 rounded-full animate-bounce"
+            style={{ animationDelay: `${i * 0.15}s` }}
+          />
+        ))}
+      </div>
+
+      <p className="text-white/60 text-lg mt-10 tracking-wide">
+        Preparando sua experiência real
+      </p>
     </div>
   );
 }
