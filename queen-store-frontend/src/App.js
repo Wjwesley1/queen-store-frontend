@@ -380,7 +380,7 @@ if (loading) {
                       <a href="https://wa.me/5511999999999" className="bg-green-500 text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
                         WhatsApp
                       </a>
-                      <a href="mailto:contato@queenstore.com.br" className="bg-primary text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
+                      <a href="mailto:contato@queenstore.store" className="bg-primary text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
                         Email
                       </a>
                     </div>
