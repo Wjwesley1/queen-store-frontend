@@ -124,11 +124,11 @@ export default function ProdutoDetalhe() {
               {produto.descricao || "Sabonete artesanal premium feito com ingredientes 100% naturais e amor."}
             </p>
 
-           {/* FRASE PROMOCIONAL — CLEAN E LINDA, SEM FUNDO AZUL */}
+          {/* FRASE PROMOCIONAL — VERSÃO SUPER CLEAN */}
             {produto.frase_promocional && (
-              <div className="my-10 py-8 border-t-4 border-b-4 border-[#0F1B3F] text-center">
-                <p className="text-2xl lg:text-3xl font-bold text-[#0F1B3F] italic leading-relaxed px-6">
-                  “{produto.frase_promocional}”
+              <div className="my-12 text-center">
+                <p className="text-xl lg:text-2xl font-medium text-[#0F1B3F] italic leading-loose max-w-3xl mx-auto px-6">
+                  ❝ {produto.frase_promocional} ❞
                 </p>
               </div>
             )}
