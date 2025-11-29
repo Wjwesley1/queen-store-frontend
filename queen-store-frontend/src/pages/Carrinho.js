@@ -6,7 +6,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://queen-store-api.onrender.com',
-  headers: { 'x-session-id': localStorage.getItem('queen_session') || '' }
+  headers: { 'session': localStorage.getItem('queen_session') || '' }
 });
 
 export default function Carrinho() {
