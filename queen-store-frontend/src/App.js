@@ -274,40 +274,82 @@ if (loading) {
   </div>
 </section>
 
-                {/* PRODUTOS */}
-                <section id="produtos" className="py-20 bg-white">
-                  <div className="container mx-auto px-6">
-                    <h2 className="text-5xl font-bold text-center mb-16">Nossa Coleção Premium</h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                      {filtered.map(produto => (
-                        <div key={produto.id} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all">
-                          <Link to={`/produto/${produto.id}`}>
-                            <div className="aspect-square bg-cover bg-center relative" style={{ backgroundImage: `url(${produto.imagem || '/placeholder.jpg'})` }}>
-                              {produto.badge && <span className="absolute top-3 left-3 bg-primary text-white px-4 py-1 rounded-full text-sm font-bold">{produto.badge}</span>}
-                              {produto.estoque <= 5 && produto.estoque > 0 && <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full animate-pulse">Poucas unidades!</span>}
-                              {produto.estoque === 0 && (
-                                <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center">
-                                  <span className="text-white font-bold text-2xl">ESGOTADO</span>
-                                </div>
-                              )}
-                            </div>
-                          </Link>
-                          <div className="p-4">
-                            <h3 className="font-bold text-sm line-clamp-2 mb-2">{produto.nome}</h3>
-                            <p className="text-primary font-bold text-xl mb-3">R$ {produto.preco}</p>
-                            <button
-  onClick={() => addToCart(produto, 1)}
-  disabled={produto.estoque === 0}
-  className="w-full py-3 rounded-full font-bold bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] transition"
->
-  Adicionar ao Carrinho
-</button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+{/* PRODUTOS — AGORA MOSTRA A PRIMEIRA FOTO DO ARRAY NA HOME */}
+<section id="produtos" className="py-20 bg-white">
+  <div className="container mx-auto px-6">
+    <h2 className="text-5xl font-bold text-center mb-16 text-[#0F1B3F]">
+      Nossa Coleção Premium
+    </h2>
+
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {filtered.map(produto => {
+        // PEGA A PRIMEIRA FOTO DO ARRAY OU A ANTIGA
+        const fotoPrincipal = 
+          produto.imagens && produto.imagens.length > 0 
+            ? produto.imagens[0] 
+            : produto.imagem || 'https://i.ibb.co/0s0qQ6Q/placeholder-queen.jpg';
+
+        return (
+          <div 
+            key={produto.id} 
+            className="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-300"
+          >
+            <Link to={`/produto/${produto.id}`}>
+              <div 
+                className="aspect-square bg-cover bg-center relative"
+                style={{ backgroundImage: `url(${fotoPrincipal})` }}
+              >
+                {/* BADGE */}
+                {produto.badge && (
+                  <span className="absolute top-3 left-3 bg-[#0F1B3F] text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                    {produto.badge}
+                  </span>
+                )}
+
+                {/* POUCAS UNIDADES */}
+                {produto.estoque <= 5 && produto.estoque > 0 && (
+                  <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full animate-pulse font-bold shadow-lg">
+                    Poucas unidades!
+                  </span>
+                )}
+
+                {/* ESGOTADO */}
+                {produto.estoque === 0 && (
+                  <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl tracking-wider">
+                      ESGOTADO
+                    </span>
                   </div>
-                </section>
+                )}
+              </div>
+            </Link>
+
+            <div className="p-4">
+              <h3 className="font-bold text-sm line-clamp-2 mb-2 text-gray-800">
+                {produto.nome}
+              </h3>
+              <p className="text-[#0F1B3F] font-bold text-xl mb-4">
+                R$ {parseFloat(produto.preco).toFixed(2)}
+              </p>
+
+              <button
+                onClick={() => produto.estoque > 0 && addToCart(produto, 1)}
+                disabled={produto.estoque === 0}
+                className={`w-full py-3 rounded-full font-bold transition-all ${
+                  produto.estoque === 0
+                    ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                    : 'bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] hover:shadow-xl'
+                }`}
+              >
+                {produto.estoque === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
 
                 {/* AVALIAÇÕES */}
                 <section id="avaliacoes" className="py-20 bg-gray-50">
