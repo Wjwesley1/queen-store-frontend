@@ -377,7 +377,7 @@ if (loading) {
                     <h2 className="text-5xl font-bold mb-8">Fale com a Rainha</h2>
                     <p className="text-xl text-gray-600 mb-12">Dúvidas? Pedidos personalizados? Estamos aqui pra te atender como você merece.</p>
                     <div className="flex flex-col sm:flex-row justify-center gap-8 max-w-2xl mx-auto">
-                      <a href="https://wa.me/5511999999999" className="bg-green-500 text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
+                      <a href="https://wa.me/5531972552077" className="bg-green-500 text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
                         WhatsApp
                       </a>
                       <a href="mailto:contato@queenstore.store" className="bg-primary text-white px-10 py-6 rounded-2xl font-bold text-xl hover:scale-110 transition shadow-2xl">
