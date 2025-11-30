@@ -252,3 +252,56 @@ html {
 }
 
 }
+
+/* ANIMAÇÕES PERSONALIZADAS DA QUEEN */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 4s linear infinite;
+}
+
+@keyframes loading-bar {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+.animate-loading-bar {
+  animation: loading-bar 3s ease-in-out infinite;
+}
+@keyframes loading-bar {
+  0% { width: 0%; }
+  60% { width: 85%; }
+  100% { width: 100%; }
+}
+.animate-loading-bar {
+  animation: loading-bar 2.5s ease-in-out infinite;
+}
+/* BARRA FLUÍDA LENTA E LUXUOSA — 5 SEGUNDOS */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 5s ease-in-out infinite;
+}
+
+/* BRILHO LENTO E PODEROSO */
+@keyframes shine {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
+}
+
+.animate-shine {
+  animation: shine 5s ease-in-out infinite 0.8s; /* começa um pouco depois pra ficar mais bonito */
+}
