@@ -9,6 +9,7 @@ import AdminLogin from './pages/Admin/AdminLogin.jsx';
 import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
 import CadastrarProduto from './pages/Admin/CadastrarProduto.jsx';
 import ControleEstoque from './pages/Admin/ControleEstoque.jsx';
+import Pedidos from './pages/Admin/Pedidos.jsx';
 
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
@@ -209,84 +210,84 @@ if (loading) {
           <Routes>
             <Route path="/" element={
               <>
-               {/* HERO COM VÍDEO DE FUNDO — A RAINHA NASCEU!!! */}
-<section className="relative h-screen flex items-center justify-center overflow-hidden">
-  {/* VÍDEO DE FUNDO */}
-  <video
-    autoPlay
-    loop
-    muted
-    playsInline
-    className="absolute w-full h-full object-cover"
-  >
-    <source src="/videos/fundo-hero.mp4" type="video/mp4" />
-    Seu navegador não suporta vídeo.
-  </video>
+              {/* HERO COM VÍDEO DE FUNDO — A RAINHA NASCEU!!! */}
+              <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                {/* VÍDEO DE FUNDO */}
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute w-full h-full object-cover"
+                >
+                  <source src="/videos/fundo-hero.mp4" type="video/mp4" />
+                  Seu navegador não suporta vídeo.
+                </video>
 
-  {/* OVERLAY ROXO/ROSA COM GRADIENTE */}
-  <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/70 to-transparent"></div>
+                {/* OVERLAY ROXO/ROSA COM GRADIENTE */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/70 to-transparent"></div>
 
-  {/* CONTEÚDO DO HERO */}
-  <div className="relative z-10 container mx-auto px-6 text-center text-white">
-    <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight animate-fade-in">
-      Cuidado Natural<br />para Sua Pele
-    </h2>
-    <p className="text-xl md:text-2xl mb-10 opacity-90">
-      Sabonetes artesanais • 100% naturais • Feitos com amor e poder
-    </p>
-    <Link
-      to="/#produtos"
-      className="inline-block bg-white text-primary px-12 py-6 rounded-full text-2xl font-bold hover:scale-110 transition shadow-2xl hover:shadow-purple-500/50"
-    >
-      Conheça a Coleção
-    </Link>
-  </div>
+                {/* CONTEÚDO DO HERO */}
+                <div className="relative z-10 container mx-auto px-6 text-center text-white">
+                  <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight animate-fade-in">
+                    Cuidado Natural<br />para Sua Pele
+                  </h2>
+                  <p className="text-xl md:text-2xl mb-10 opacity-90">
+                    Sabonetes artesanais • 100% naturais • Feitos com amor e poder
+                  </p>
+                  <Link
+                    to="/#produtos"
+                    className="inline-block bg-white text-primary px-12 py-6 rounded-full text-2xl font-bold hover:scale-110 transition shadow-2xl hover:shadow-purple-500/50"
+                  >
+                    Conheça a Coleção
+                  </Link>
+                </div>
 
-  {/* SCROLL INDICATOR */}
-  <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-    <svg className="w-10 h-10 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-    </svg>
-  </div>
-</section>
+                {/* SCROLL INDICATOR */}
+                <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+                  <svg className="w-10 h-10 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                </div>
+              </section>
 
-                {/* FILTROS DINÂMICOS — VEM DO BANCO! */}
-<section className="py-8 bg-gray-100 border-b">
-  <div className="container mx-auto px-6">
-    <div className="flex justify-center gap-4 flex-wrap">
-      {/* BOTÃO TODOS */}
-      <button
-        onClick={() => setCategoria('all')}
-        className={`px-8 py-3 rounded-full font-bold transition ${categoria === 'all' ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
-      >
-        Todos
-      </button>
+              {/* FILTROS DINÂMICOS — VEM DO BANCO! */}
+              <section className="py-8 bg-gray-100 border-b">
+                <div className="container mx-auto px-6">
+                  <div className="flex justify-center gap-4 flex-wrap">
+                    {/* BOTÃO TODOS */}
+                    <button
+                      onClick={() => setCategoria('all')}
+                      className={`px-8 py-3 rounded-full font-bold transition ${categoria === 'all' ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
+                    >
+                      Todos
+                    </button>
 
-      {/* CATEGORIAS DO BANCO */}
-      {categorias.map(cat => (
-  <button
-    key={cat}
-    onClick={() => setCategoria(cat)}  // guarda com maiúscula certa
-    className={`px-8 py-3 rounded-full font-bold transition ${
-      categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'
-    }`}
-  >
-    {cat}
-  </button>
-))}
-    </div>
-  </div>
-</section>
+                    {/* CATEGORIAS DO BANCO */}
+                    {categorias.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setCategoria(cat)}
+                        className={`px-8 py-3 rounded-full font-bold transition ${
+                          categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
 
-{/* PRODUTOS — AGORA MOSTRA A PRIMEIRA FOTO DO ARRAY NA HOME */}
-<section id="produtos" className="py-20 bg-white">
-  <div className="container mx-auto px-6">
-    <h2 className="text-5xl font-bold text-center mb-16 text-[#0F1B3F]">
-      Nossa Coleção Premium
-    </h2>
+              {/* PRODUTOS — AGORA MOSTRA A PRIMEIRA FOTO DO ARRAY NA HOME */}
+              <section id="produtos" className="py-20 bg-white">
+                <div className="container mx-auto px-6">
+                  <h2 className="text-5xl font-bold text-center mb-16 text-[#0F1B3F]">
+                    Nossa Coleção Premium
+                  </h2>
 
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {filtered.map(produto => {
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {filtered.map(produto => {
         // PEGA A PRIMEIRA FOTO DO ARRAY OU A ANTIGA
         const fotoPrincipal = 
           produto.imagens && produto.imagens.length > 0 
@@ -470,6 +471,16 @@ if (loading) {
                 </div>
               </div>
             } />
+
+            <Route 
+              path="/admin/pedidos" 
+              element={
+                localStorage.getItem('admin-logado') === 'true' 
+            ? <Pedidos /> 
+            : <Navigate to="/admin" />
+        } 
+      />
+
           </Routes>
         </div>
       </CarrinhoContext.Provider>

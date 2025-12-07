@@ -1,4 +1,4 @@
-// src/pages/Admin/ControleEstoque.jsx
+// src/pages/Admin/ControleEstoque.jsx — 100% CORRIGIDO E FUNCIONANDO
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -51,9 +51,16 @@ export default function ControleEstoque() {
     }
   };
 
+  // CORREÇÃO: fechava o if cedo demais — agora tá certo!
   if (loading) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-4xl text-[#0F1B3F]">Carregando estoque...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center text-4xl text-[#0F1B3F]">
+        Carregando estoque...
+      </div>
+    );
+  }
 
+  // AQUI É O RETURN PRINCIPAL — TAVA FORA DO LUGAR ANTES
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-6 max-w-7xl">
@@ -107,7 +114,7 @@ export default function ControleEstoque() {
                       {editando === produto.id ? (
                         <div className="flex gap-3 justify-center">
                           <button
-                            onClick={() => atualizarEstoque(produto.id, produto.estoque)}
+                            onClick={() => atualizarEstoque(produto.id)}
                             className="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-700"
                           >
                             Salvar
@@ -143,5 +150,4 @@ export default function ControleEstoque() {
       </div>
     </div>
   );
-}
 }

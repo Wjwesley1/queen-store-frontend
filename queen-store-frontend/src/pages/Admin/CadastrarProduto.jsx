@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const API_URL = 'https://queen-store-api.onrender.com';
 
@@ -58,12 +59,14 @@ export default function CadastrarProduto() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-6 max-w-4xl">
-        <div className="bg-white rounded-3xl shadow-2xl p-10">
-          <h1 className="text-4xl font-bold text-[#0F1B3F] mb-8 text-center">
-            Cadastrar Novo Produto
-          </h1>
-
+          <div className="container mx-auto px-6 max-w-7xl">
+            <div className="bg-white rounded-3xl shadow-2xl p-10">
+              <div className="flex justify-between items-center mb-10">
+                <h1 className="text-5xl font-bold text-[#0F1B3F]">Cadastrar Produto</h1>
+                <Link to="/admin/dashboard" className="bg-[#0F1B3F] text-white px-8 py-4 rounded-full hover:bg-pink-600 transition">
+                  Voltar ao Painel
+                </Link>
+              </div>
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* NOME E PREÇO */}
             <div className="grid md:grid-cols-2 gap-8">
