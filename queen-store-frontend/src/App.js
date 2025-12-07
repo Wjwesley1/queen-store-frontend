@@ -8,6 +8,7 @@ import LoadingQueen from './components/LoadingQueen';
 import AdminLogin from './pages/Admin/AdminLogin.jsx';
 import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
 import CadastrarProduto from './pages/Admin/CadastrarProduto.jsx';
+import ControleEstoque from './pages/Admin/ControleEstoque.jsx';
 
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
@@ -437,6 +438,9 @@ if (loading) {
             } />
             <Route path="/admin/cadastrar" element={
               localStorage.getItem('admin-logado') ? <CadastrarProduto /> : <Navigate to="/admin" />
+            } />
+            <Route path="/admin/estoque" element={
+              localStorage.getItem('admin-logado') ? <ControleEstoque /> : <Navigate to="/admin" />
             } />
 
             <Route path="/favoritos" element={
