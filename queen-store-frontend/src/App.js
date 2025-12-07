@@ -1,10 +1,13 @@
 // src/App.js — QUEEN STORE FRONTEND 100% COMPLETO, RESPONSIVO E IMORTAL
 
 import React, { useEffect, useState, createContext, useContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import LoadingQueen from './components/LoadingQueen'; 
+import AdminLogin from './pages/Admin/AdminLogin.jsx';
+import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
+import CadastrarProduto from './pages/Admin/CadastrarProduto.jsx';
 
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
@@ -174,7 +177,7 @@ if (loading) {
           <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
             <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
               <Link to="/" className="text-center sm:text-left">
-                <h1 className="text-4xl font-bold text-primary">Queen</h1>
+                <h1 className="text-4xl font-bold text-primary"> ♕Queen</h1>
                 <p className="text-xs text-gray-500 uppercase tracking-widest">Se cuidar é reinar.</p>
               </Link>
 
@@ -351,25 +354,53 @@ if (loading) {
   </div>
 </section>
 
-                {/* AVALIAÇÕES */}
-                <section id="avaliacoes" className="py-20 bg-gray-50">
-                  <div className="container mx-auto px-6 text-center">
-                    <h2 className="text-5xl font-bold mb-12">O Que Nossas Rainhas Dizem</h2>
-                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-                      {[
-                        { nome: "Maria Silva", texto: "vsco.co/unknowit" },
-                        { nome: "Ana Costa", texto: "Cheiro maravilhoso que dura o dia todo. Já virei cliente fiel!" },
-                        { nome: "Juliana Lima", texto: "Entrega rápida e produto de altíssima qualidade. Recomendo!" }
-                      ].map((r, i) => (
-                        <div key={i} className="bg-white p-8 rounded-2xl shadow-xl">
-                          <div className="text-yellow-500 text-2xl mb-4">★★★★★</div>
-                          <p className="text-gray-700 italic mb-6">"{r.texto}"</p>
-                          <p className="font-bold text-primary">{r.nome}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
+{/* AVALIAÇÕES — AGORA COM DEPOIMENTOS REAIS DAS CLIENTES */}
+
+<section id="avaliacoes" className="py-20 bg-gradient-to-b from-white to-pink-50">
+  <div className="container mx-auto px-6 text-center">
+    <h2 className="text-5xl lg:text-6xl font-bold text-[#0F1B3F] mb-4">
+      O Que Nossas Rainhas Dizem
+    </h2>
+
+    <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+      {/* Avaliação 1 - Nayara */}
+      <div className="bg-white p-10 rounded-3xl shadow-2xl hover:shadow-pink-200 transition-all hover:scale-105">
+        <div className="text-yellow-500 text-3xl mb-6">★★★★★</div>
+        <p className="text-gray-700 text-lg italic leading-relaxed mb-8">
+          “As geleias de banho são simplesmente maravilhosas! Além de terem fragrâncias deliciosas, elas realmente fixam na pele e deixam uma hidratação incrível.”
+        </p>
+        <p className="flex justify-center gap-1 mb-4">
+          <span className="text-4xl">🜲</span>
+        </p>
+        <p className="font-bold text-[#0F1B3F] text-xl">— Nayara Estefany</p>
+      </div>
+
+      {/* Avaliação 2 - Lorrany */}
+      <div className="bg-white p-10 rounded-3xl shadow-2xl hover:shadow-pink-200 transition-all hover:scale-105 border-4 border-pink-200">
+        <div className="text-yellow-500 text-3xl mb-6">★★★★★</div>
+        <p className="text-gray-700 text-lg italic leading-relaxed mb-8">
+          “O sabonete em barra de camomila e erva-doce é um sensorial completo. Ele acalma a pele e a mente. Ótimo para dias de TPM”
+        </p>
+        <p className="flex justify-center gap-1 mb-4">
+          <span className="text-4xl">🜲</span>
+        </p>
+        <p className="font-bold text-[#0F1B3F] text-xl">— Lorrany Vitória</p>
+      </div>
+
+      {/* Avaliação 3 - Camila */}
+      <div className="bg-white p-10 rounded-3xl shadow-2xl hover:shadow-pink-200 transition-all hover:scale-105">
+        <div className="text-yellow-500 text-3xl mb-6">★★★★★</div>
+        <p className="text-gray-700 text-lg italic leading-relaxed mb-8">
+          “Eu amei as geleias de banho. Comprei o de limão siciliano e o de maracujá azedo — são muito gostosos.”
+        </p>
+        <p className="flex justify-center gap-1 mb-4">
+          <span className="text-4xl">🜲</span>
+        </p>
+        <p className="font-bold text-[#0F1B3F] text-xl">— Camila Schirmer</p>
+      </div>
+    </div>
+  </div>
+</section>
 
                 {/* CONTATO */}
                 <section id="contato" className="py-20 bg-white">
@@ -390,7 +421,7 @@ if (loading) {
                 {/* FOOTER */}
                 <footer className="bg-gray-900 text-white py-12">
                   <div className="container mx-auto px-6 text-center">
-                    <h3 className="text-4xl font-bold mb-4">Queen Store</h3>
+                    <h3 className="text-4xl font-bold mb-4">♕Queen Store</h3>
                     <p className="text-gray-400 mb-6">Se cuidar é reinar.</p>
                     <p className="text-sm">© 2025 Queen Store • Todos os direitos reservados • Feito com amor no Brasil</p>
                   </div>
@@ -400,6 +431,14 @@ if (loading) {
 
             <Route path="/carrinho" element={<Carrinho />} />
             <Route path="/produto/:id" element={<ProdutoDetalhe />} />
+            <Route path="/admin" element={<AdminLogin />} />
+            <Route path="/admin/dashboard" element={
+              localStorage.getItem('admin-logado') ? <AdminDashboard /> : <Navigate to="/admin" />
+            } />
+            <Route path="/admin/cadastrar" element={
+              localStorage.getItem('admin-logado') ? <CadastrarProduto /> : <Navigate to="/admin" />
+            } />
+
             <Route path="/favoritos" element={
               <div className="min-h-screen bg-gray-50 py-20">
                 <div className="container mx-auto px-6">
