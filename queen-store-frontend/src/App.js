@@ -4,7 +4,6 @@ import React, { useEffect, useState, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import { Analytics } from "@vercel/analytics/react";
 import LoadingQueen from './components/LoadingQueen'; 
 
 import Carrinho from './pages/Carrinho';
@@ -358,7 +357,7 @@ if (loading) {
                     <h2 className="text-5xl font-bold mb-12">O Que Nossas Rainhas Dizem</h2>
                     <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
                       {[
-                        { nome: "Maria Silva", texto: "Melhor sabonete da vida! Minha pele nunca esteve tão macia." },
+                        { nome: "Maria Silva", texto: "vsco.co/unknowit" },
                         { nome: "Ana Costa", texto: "Cheiro maravilhoso que dura o dia todo. Já virei cliente fiel!" },
                         { nome: "Juliana Lima", texto: "Entrega rápida e produto de altíssima qualidade. Recomendo!" }
                       ].map((r, i) => (
