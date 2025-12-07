@@ -193,14 +193,6 @@ export default function ControleEstoque() {
             </table>
           </div>
         </div>
-
-        {/* BOTÃO FIXO VOLTAR */}
-        <Link
-          to="/admin/dashboard"
-          className="fixed bottom-8 left-8 z-50 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white px-10 py-6 rounded-full shadow-2xl font-bold text-2xl flex items-center gap-4 hover:scale-110 transition-all border-4 border-white/30"
-        >
-          ← VOLTAR AO DASHBOARD
-        </Link>
       </div>
     </div>
   );
