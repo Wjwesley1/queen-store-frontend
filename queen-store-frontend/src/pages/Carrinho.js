@@ -104,34 +104,38 @@ export default function Carrinho() {
 
             <div className="text-center">
               <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-green-500 hover:bg-green-600 text-white px-12 py-6 rounded-full text-xl md:text-2xl font-bold transition transform hover:scale-105 shadow-2xl"
-                onClick={async () => {
-                  try {
-                    await axios.post(`${API_URL}/api/pedidos`, {
-                      cliente_nome: "Cliente via WhatsApp",
-                      cliente_whatsapp: "cliente",
-                      itens: carrinho.map(i => ({
-                        nome: i.nome,
-                        quantidade: i.quantidade,
-                        preco: parseFloat(i.preco)
-                      })),
-                      valor_total: total,
-                      endereco: "Endereço via WhatsApp",
-                      cidade: "Cidade",
-                      estado: "ST",
-                      cep: "00000000"
-                    });
-                    alert('Pedido registrado com sucesso! Em breve entraremos em contato.');
-                  } catch (err) {
-                    console.log("Erro ao salvar pedido, mas WhatsApp abre mesmo assim");
-                  }
-                }}
-              >
-                FINALIZAR NO WHATSAPP
-              </a>
+  href={whatsappLink}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-block bg-green-500 hover:bg-green-600 text-white px-16 py-8 rounded-full text-3xl font-bold transition transform hover:scale-105 shadow-2xl"
+  onClick={async () => {
+    try {
+      await axios.post(`${API_URL}/api/pedidos`, {
+        cliente_nome: "Cliente via WhatsApp",
+        cliente_whatsapp: "Não informado",
+        itens: carrinho.map(i => ({
+          nome: i.nome,
+          quantidade: i.quantidade,
+          preco: parseFloat(i.preco)
+        })),
+        valor_total: parseFloat(total)
+      });
+      
+      // ALERTA BONITO DE SUCESSO
+      const alert = document.createElement('div');
+      alert.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-12 py-6 rounded-full shadow-2xl z-50 text-3xl font-bold animate-pulse';
+      alert.textContent = 'PEDIDO SALVO COM SUCESSO!';
+      document.body.appendChild(alert);
+      setTimeout(() => alert.remove(), 4000);
+      
+    } catch (err) {
+      console.error("Erro ao salvar pedido:", err);
+      alert('Erro ao salvar pedido, mas WhatsApp vai abrir');
+    }
+  }}
+>
+  FINALIZAR NO WHATSAPP
+</a>
             </div>
 
             <p className="text-center text-white/80 mt-6 text-sm md:text-base">

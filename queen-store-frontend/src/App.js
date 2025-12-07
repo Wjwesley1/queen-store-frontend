@@ -179,8 +179,8 @@ if (loading) {
           <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
             <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
               <Link to="/" className="text-center sm:text-left">
-                <h1 className="text-4xl font-bold text-primary"> ♕Queen</h1>
-                <p className="text-xs text-gray-500 uppercase tracking-widest">Se cuidar é reinar.</p>
+                <h1 className="text-4xl font-bold text-primary"> 🎄Queen Store</h1>
+                {/*<p className="text-xs text-gray-500 uppercase tracking-widest">Se cuidar é reinar.</p>*/}
               </Link>
 
               <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
@@ -423,7 +423,7 @@ if (loading) {
                 {/* FOOTER */}
                 <footer className="bg-gray-900 text-white py-12">
                   <div className="container mx-auto px-6 text-center">
-                    <h3 className="text-4xl font-bold mb-4">♕Queen Store</h3>
+                    <h3 className="text-4xl font-bold mb-4">🎄Queen Store</h3>
                     <p className="text-gray-400 mb-6">Se cuidar é reinar.</p>
                     <p className="text-sm">© 2025 Queen Store • Todos os direitos reservados • Feito com amor no Brasil</p>
                   </div>
