@@ -1,5 +1,5 @@
-// src/pages/Admin/Pedidos.jsx — EDIÇÃO COMPLETA + LISTA DE PEDIDOS
-import React, {useEffect, useState } from 'react';
+// src/pages/Admin/Pedidos.jsx — CONCLUÍDO + BLOQUEIO TOTAL + EDIÇÃO SEGURA
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -27,6 +27,10 @@ export default function Pedidos() {
   };
 
   const iniciarEdicao = (pedido) => {
+    if (pedido.status === 'concluido') {
+      alert('Pedido concluído não pode ser editado!');
+      return;
+    }
     setEditando(pedido.id);
     setForm({
       cliente_nome: pedido.cliente_nome,
@@ -62,6 +66,11 @@ export default function Pedidos() {
   };
 
   const atualizarStatus = async (id, status) => {
+    if (status === 'concluido') {
+      if (!confirm('Tem certeza que quer marcar como CONCLUÍDO? Não poderá mais editar depois!')) {
+        return;
+      }
+    }
     try {
       await axios.patch(`${API_URL}/api/pedidos/${id}`, { status });
       carregarPedidos();
@@ -78,10 +87,21 @@ export default function Pedidos() {
   const parseItens = (itens) => {
     if (!itens) return [];
     if (Array.isArray(itens)) return itens;
-    if (typeof itens === 'string') {
-      try { return JSON.parse(itens); } catch { return []; }
+    try { return JSON.parse(itens); } catch { return []; }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'concluido': return 'bg-gradient-to-r from-gray-600 to-gray-800';
+      case 'entregue': return 'bg-purple-600';
+      case 'enviado': return 'bg-blue-600';
+      case 'pago': return 'bg-green-600';
+      default: return 'bg-yellow-600';
     }
-    return [];
+  };
+
+  const getStatusTexto = (status) => {
+    return status === 'concluido' ? 'CONCLUÍDO' : status?.toUpperCase() || 'PENDENTE';
   };
 
   if (loading) {
@@ -93,7 +113,7 @@ export default function Pedidos() {
       <div className="container mx-auto px-6 max-w-7xl">
         <div className="bg-white rounded-3xl shadow-2xl p-10">
           <div className="flex justify-between items-center mb-12">
-            <h1 className="text-5xl font-bold text-[#0F1B3F]">Pedidos ({pedidos.length})</h1>
+            <h1 className="text-6xl font-bold text-[#0F1B3F]">Pedidos ({pedidos.length})</h1>
             <Link to="/admin/dashboard" className="bg-[#0F1B3F] text-white px-8 py-4 rounded-full hover:bg-pink-600 text-xl font-bold">
               Voltar ao Painel
             </Link>
@@ -102,85 +122,57 @@ export default function Pedidos() {
           <div className="space-y-10">
             {pedidos.map(pedido => {
               const itens = parseItens(pedido.itens);
+              const isConcluido = pedido.status === 'concluido';
 
               return (
-                <div key={pedido.id} className="bg-gradient-to-r from-pink-50 to-purple-50 p-10 rounded-3xl shadow-2xl border-l-8 border-[#0F1B3F]">
+                <div key={pedido.id} className={`p-10 rounded-3xl shadow-2xl border-l-8 border-[#0F1B3F] transition-all ${
+                  isConcluido ? 'bg-gray-100 opacity-80' : 'bg-gradient-to-r from-pink-50 to-purple-50'
+                }`}>
+                  {/* CABEÇALHO */}
+                  <div className="flex flex-col md:flex-row justify-between items-start mb-8">
+                    <div>
+                      <h2 className="text-4xl font-bold text-[#0F1B3F]">Pedido #{pedido.id}</h2>
+                      <p className="text-xl text-gray-600">
+                        {new Date(pedido.criado_em).toLocaleString('pt-BR')}
+                      </p>
+                    </div>
+                    <div className="text-right mt-4 md:mt-0">
+                      <p className="text-5xl font-bold text-green-600">
+                        R$ {parseFloat(pedido.valor_total).toFixed(2)}
+                      </p>
+                      <span className={`inline-block mt-4 px-8 py-4 rounded-full text-white font-bold text-2xl ${getStatusColor(pedido.status)}`}>
+                        {getStatusTexto(pedido.status)}
+                      </span>
+                    </div>
+                  </div>
+
                   {/* MODO EDIÇÃO */}
                   {editando === pedido.id ? (
-                    <div className="space-y-8">
-                      <input
-                        value={form.cliente_nome}
-                        onChange={e => setForm({...form, cliente_nome: e.target.value})}
-                        className="w-full px-6 py-4 rounded-xl border-2 border-[#0F1B3F] text-xl"
-                        placeholder="Nome do cliente"
-                      />
-                      <input
-                        value={form.cliente_whatsapp}
-                        onChange={e => setForm({...form, cliente_whatsapp: e.target.value})}
-                        className="w-full px-6 py-4 rounded-xl border-2 border-[#0F1B3F] text-xl"
-                        placeholder="WhatsApp"
-                      />
-                      <textarea
-                        value={form.itens}
-                        onChange={e => setForm({...form, itens: e.target.value})}
-                        rows="10"
-                        className="w-full px-6 py-4 rounded-xl border-2 border-[#0F1B3F] text-lg font-mono bg-gray-100"
-                        placeholder='[{"nome": "Geleia Melancia", "quantidade": 2, "preco": 29.90}]'
-                      />
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={form.valor_total}
-                        onChange={e => setForm({...form, valor_total: e.target.value})}
-                        className="w-full px-6 py-4 rounded-xl border-2 border-[#0F1B3F] text-xl"
-                        placeholder="Valor total"
-                      />
-                      <select
-                        value={form.status}
-                        onChange={e => setForm({...form, status: e.target.value})}
-                        className="w-full px-6 py-4 rounded-xl border-2 border-[#0F1B3F] text-xl"
-                      >
+                    <div className="space-y-6 p-8 bg-white/80 rounded-2xl">
+                      <input value={form.cliente_nome} onChange={e => setForm({...form, cliente_nome: e.target.value})} className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] text-xl" placeholder="Nome" />
+                      <input value={form.cliente_whatsapp} onChange={e => setForm({...form, cliente_whatsapp: e.target.value})} className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] text-xl" placeholder="WhatsApp" />
+                      <textarea value={form.itens} onChange={e => setForm({...form, itens: e.target.value})} rows="8" className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] font-mono text-sm bg-gray-100" />
+                      <input type="number" step="0.01" value={form.valor_total} onChange={e => setForm({...form, valor_total: e.target.value})} className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] text-xl" />
+                      <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] text-xl">
                         <option value="pendente">Pendente</option>
                         <option value="pago">Pago</option>
                         <option value="enviado">Enviado</option>
                         <option value="entregue">Entregue</option>
+                        <option value="concluido">Concluído</option>
                       </select>
-
                       <div className="flex gap-4">
-                        <button onClick={() => salvarEdicao(pedido.id)} className="bg-green-600 text-white px-10 py-5 rounded-full hover:bg-green-700 text-2xl font-bold">
-                          SALVAR
-                        </button>
-                        <button onClick={cancelarEdicao} className="bg-gray-600 text-white px-10 py-5 rounded-full hover:bg-gray-700 text-2xl font-bold">
-                          CANCELAR
-                        </button>
+                        <button onClick={() => salvarEdicao(pedido.id)} className="bg-green-600 text-white px-10 py-5 rounded-full hover:bg-green-700 text-2xl font-bold">SALVAR</button>
+                        <button onClick={cancelarEdicao} className="bg-gray-600 text-white px-10 py-5 rounded-full hover:bg-gray-700 text-2xl font-bold">CANCELAR</button>
                       </div>
                     </div>
                   ) : (
-                    // MODO VISUALIZAÇÃO NORMAL
                     <>
-                      <div className="flex justify-between items-center mb-6">
-                        <div>
-                          <h2 className="text-4xl font-bold text-[#0F1B3F]">Pedido #{pedido.id}</h2>
-                          <p className="text-xl text-gray-600">
-                            {new Date(pedido.criado_em).toLocaleString('pt-BR')}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => iniciarEdicao(pedido)}
-                          className="bg-[#0F1B3F] text-white px-8 py-4 rounded-full hover:bg-pink-600 text-xl font-bold"
-                        >
-                          EDITAR PEDIDO
-                        </button>
-                      </div>
-
+                      {/* VISUALIZAÇÃO NORMAL */}
                       <div className="grid md:grid-cols-2 gap-8 mb-8">
                         <div>
                           <p className="text-2xl font-bold text-[#0F1B3F]">Cliente</p>
                           <p className="text-xl">{pedido.cliente_nome}</p>
-                          <button
-                            onClick={() => abrirWhatsApp(pedido.cliente_whatsapp)}
-                            className="mt-4 bg-green-500 text-white px-8 py-4 rounded-full hover:bg-green-600 font-bold text-xl flex items-center gap-3"
-                          >
+                          <button onClick={() => abrirWhatsApp(pedido.cliente_whatsapp)} className="mt-4 bg-green-500 text-white px-8 py-4 rounded-full hover:bg-green-600 font-bold text-xl flex items-center gap-3">
                             WhatsApp Falar com cliente
                           </button>
                         </div>
@@ -195,40 +187,58 @@ export default function Pedidos() {
                       </div>
 
                       <div className="mb-8">
-                        <p className="text-2xl font-bold text-[#0F1B3F] mb-4">Itens do pedido:</p>
+                        <p className="text-2xl font-bold text-[#0F1B3F] mb-4">Itens:</p>
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
-                          {itens.length === 0 ? (
-                            <p className="text-gray-600">Nenhum item</p>
-                          ) : (
-                            itens.map((item, i) => (
-                              <div key={i} className="flex justify-between py-3 border-b last:border-0 text-lg">
-                                <span>{item.quantidade || 1}x {item.nome}</span>
-                                <span className="font-bold">
-                                  R$ {(parseFloat(item.preco || 0) * (item.quantidade || 1)).toFixed(2)}
-                                </span>
-                              </div>
-                            ))
-                          )}
+                          {itens.map((item, i) => (
+                            <div key={i} className="flex justify-between py-3 border-b last:border-0 text-lg">
+                              <span>{item.quantidade}x {item.nome}</span>
+                              <span className="font-bold">R$ {(item.preco * item.quantidade).toFixed(2)}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
+                      {/* BOTÕES DE AÇÃO */}
                       <div className="flex flex-wrap gap-6 justify-center">
-                        {pedido.status !== 'pago' && (
+                        {!isConcluido && pedido.status !== 'pago' && (
                           <button onClick={() => atualizarStatus(pedido.id, 'pago')} className="bg-green-600 text-white px-10 py-5 rounded-full hover:bg-green-700 text-2xl font-bold">
                             Marcar como PAGO
                           </button>
                         )}
-                        {pedido.status === 'pago' && pedido.status !== 'enviado' && (
+                        {!isConcluido && pedido.status === 'pago' && pedido.status !== 'enviado' && (
                           <button onClick={() => atualizarStatus(pedido.id, 'enviado')} className="bg-blue-600 text-white px-10 py-5 rounded-full hover:bg-blue-700 text-2xl font-bold">
                             Marcar como ENVIADO
                           </button>
                         )}
-                        {pedido.status === 'enviado' && (
+                        {!isConcluido && pedido.status === 'enviado' && (
                           <button onClick={() => atualizarStatus(pedido.id, 'entregue')} className="bg-purple-600 text-white px-10 py-5 rounded-full hover:bg-purple-700 text-2xl font-bold">
                             Marcar como ENTREGUE
                           </button>
                         )}
+                        {!isConcluido && (
+                          <button onClick={() => atualizarStatus(pedido.id, 'concluido')} className="bg-gradient-to-r from-gray-700 to-gray-900 text-white px-10 py-5 rounded-full hover:opacity-90 text-2xl font-bold">
+                            MARCAR COMO CONCLUÍDO
+                          </button>
+                        )}
+                        {isConcluido && (
+                          <div className="text-center py-8">
+                            <p className="text-4xl font-bold text-gray-700 animate-pulse">
+                              PEDIDO CONCLUÍDO
+                            </p>
+                            <p className="text-xl text-gray-600 mt-4">Bloqueado para edição</p>
+                          </div>
+                        )}
                       </div>
+
+                      {/* BOTÃO EDITAR (só aparece se não for concluído) */}
+                      {!isConcluido && (
+                        <button
+                          onClick={() => iniciarEdicao(pedido)}
+                          className="mt-8 bg-[#0F1B3F] text-white px-10 py-5 rounded-full hover:bg-pink-600 text-2xl font-bold"
+                        >
+                          EDITAR PEDIDO
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
