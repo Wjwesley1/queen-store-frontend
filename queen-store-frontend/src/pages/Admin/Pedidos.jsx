@@ -67,9 +67,9 @@ export default function Pedidos() {
 
   const atualizarStatus = async (id, status) => {
     if (status === 'concluido') {
-      if (!confirm('Tem certeza que quer marcar como CONCLUÍDO? Não poderá mais editar depois!')) {
-        return;
-      }
+      if (!window.confirm('Tem certeza que quer marcar como CONCLUÍDO? Não poderá mais editar depois!')) {
+      return;
+    }
     }
     try {
       await axios.patch(`${API_URL}/api/pedidos/${id}`, { status });
