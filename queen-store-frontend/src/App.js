@@ -99,10 +99,9 @@ useEffect(() => {
     });
 }, []);
 
-  // ADICIONAR AO CARRINHO
-  const addToCart = async (produto, quantidade = 1) => {
+const addToCart = async (produto, quantidade = 1) => {
   if (produto.estoque < quantidade) {
-    showNotification("Estoque insuficiente!");
+    showNotification("Estoque insuficiente! 😔");
     return;
   }
 
@@ -112,9 +111,10 @@ useEffect(() => {
       quantidade
     });
     carregarCarrinho();
-    showNotification(`\( {quantidade}x \){produto.nome} adicionado(s)!`);
+    showNotification(`${quantidade} × ${produto.nome} adicionado(s) ao carrinho! 🛒✨`);
   } catch (err) {
-    showNotification("Erro ao adicionar");
+    console.error(err);
+    showNotification("Erro ao adicionar ao carrinho 😢");
   }
 };
 
