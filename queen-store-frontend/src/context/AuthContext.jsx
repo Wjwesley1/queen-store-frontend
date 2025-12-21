@@ -34,11 +34,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (token) => {
+  const login = (token, clienteData) => {
     localStorage.setItem('queen_token', token);
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    const decoded = jwtDecode(token);
-    setCliente({ clienteId: decoded.clienteId });
+    setCliente(clienteData);  // ← salva o objeto completo com nome
   };
 
   const logout = () => {
