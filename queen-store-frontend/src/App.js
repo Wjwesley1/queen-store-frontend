@@ -10,9 +10,14 @@ import AdminDashboard from './pages/Admin/AdminDashboard.jsx';
 import CadastrarProduto from './pages/Admin/CadastrarProduto.jsx';
 import ControleEstoque from './pages/Admin/ControleEstoque.jsx';
 import Pedidos from './pages/Admin/Pedidos.jsx';
-
+import Privacidade from './pages/Privacidade.js';
+import Termos from './pages/Termos.js';  
+import LoginModal from './components/LoginModal';
+import MinhaConta from  './pages/MinhaConta.jsx';
+import { useAuth } from './context/AuthContext';
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // ==================== CONTEXTS ====================
 const CarrinhoContext = createContext();
@@ -24,6 +29,7 @@ export const useFavoritos = () => useContext(FavoritosContext);
 // ==================== API CONFIG ====================
 const API_URL = 'https://queen-store-api.onrender.com';
 
+// ==================== SESSÃO ====================
 const getSessionId = () => {
   let sessionId = localStorage.getItem('queen_session');
   if (!sessionId) {
@@ -47,6 +53,8 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const [categorias, setCategorias] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const { cliente, logout } = useAuth();
 
   // CARREGA PRODUTOS
   useEffect(() => {
@@ -166,6 +174,7 @@ const addToCart = async (produto, quantidade = 1) => {
     </svg>
   );
 
+  
 if (loading) {
   return <LoadingQueen />;
 }
@@ -175,186 +184,154 @@ if (loading) {
       <CarrinhoContext.Provider value={{ carrinho, addToCart, removeFromCart, carregarCarrinho }}>
         <div className="min-h-screen bg-white font-sans">
 
-          {/* HEADER FIXADO — FUNCIONA EM TODAS AS PÁGINAS */}
-          <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
-            <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-              <Link to="/" className="text-center sm:text-left">
-                <h1 className="text-4xl font-bold text-primary"> 🎄Queen Store</h1>
-                {/*<p className="text-xs text-gray-500 uppercase tracking-widest">Se cuidar é reinar.</p>*/}
-              </Link>
+        <header className="sticky top-0 z-50 bg-white shadow-lg border-b">
+  <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <Link to="/" className="text-center sm:text-left">
+      <h1 className="text-4xl font-bold text-primary">🎄 Queen Store</h1>
+    </Link>
 
-              <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
-                <Link to="/#produtos" className="font-medium hover:text-primary transition">Produtos</Link>
-                <Link to="/#avaliacoes" className="font-medium hover:text-primary transition">Avaliações</Link>
-                <Link to="/#contato" className="font-medium hover:text-primary transition">Contato</Link>
+    <nav className="flex flex-wrap justify-center items-center gap-4 sm:gap-6">
+      <Link to="/#produtos" className="font-medium hover:text-primary transition">Produtos</Link>
+      <Link to="/#avaliacoes" className="font-medium hover:text-primary transition">Avaliações</Link>
+      <Link to="/#contato" className="font-medium hover:text-primary transition">Contato</Link>
 
-                <Link 
-                  to="/carrinho" 
-                  className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:scale-105 transition"
-                >
-                  Carrinho {totalItens} - R$ {totalValor}
-                </Link>
+      <Link 
+        to="/carrinho" 
+        className="bg-primary text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl hover:scale-105 transition"
+      >
+        Carrinho {totalItens} - R$ {totalValor}
+      </Link>
 
-                <Link to="/favoritos" className="relative">
-                  <HeartIcon filled={favoritos.length > 0} />
-                  {favoritos.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
-                      {favoritos.length}
-                    </span>
-                  )}
-                </Link>
-              </nav>
-            </div>
-          </header>
+      <Link to="/favoritos" className="relative">
+        <HeartIcon filled={favoritos.length > 0} />
+        {favoritos.length > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+            {favoritos.length}
+          </span>
+        )}
+      </Link>
 
-          <Routes>
-            <Route path="/" element={
-              <>
-              {/* HERO COM VÍDEO DE FUNDO — A RAINHA NASCEU!!! */}
-              <section className="relative h-screen flex items-center justify-center overflow-hidden">
-                {/* VÍDEO DE FUNDO */}
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="absolute w-full h-full object-cover"
-                >
-                  <source src="/videos/fundo-hero.mp4" type="video/mp4" />
-                  Seu navegador não suporta vídeo.
-                </video>
-
-                {/* OVERLAY ROXO/ROSA COM GRADIENTE */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/70 to-transparent"></div>
-
-                {/* CONTEÚDO DO HERO */}
-                <div className="relative z-10 container mx-auto px-6 text-center text-white">
-                  <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight animate-fade-in">
-                    Cuidado Natural<br />para Sua Pele
-                  </h2>
-                  <p className="text-xl md:text-2xl mb-10 opacity-90">
-                    Sabonetes artesanais • 100% naturais • Feitos com amor e poder
-                  </p>
-                  <Link
-                    to="/#produtos"
-                    className="inline-block bg-white text-primary px-12 py-6 rounded-full text-2xl font-bold hover:scale-110 transition shadow-2xl hover:shadow-purple-500/50"
-                  >
-                    Conheça a Coleção
-                  </Link>
-                </div>
-
-                {/* SCROLL INDICATOR */}
-                <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-                  <svg className="w-10 h-10 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                </div>
-              </section>
-
-              {/* FILTROS DINÂMICOS — VEM DO BANCO! */}
-              <section className="py-8 bg-gray-100 border-b">
-                <div className="container mx-auto px-6">
-                  <div className="flex justify-center gap-4 flex-wrap">
-                    {/* BOTÃO TODOS */}
-                    <button
-                      onClick={() => setCategoria('all')}
-                      className={`px-8 py-3 rounded-full font-bold transition ${categoria === 'all' ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}
-                    >
-                      Todos
-                    </button>
-
-                    {/* CATEGORIAS DO BANCO */}
-                    {categorias.map(cat => (
-                      <button
-                        key={cat}
-                        onClick={() => setCategoria(cat)}
-                        className={`px-8 py-3 rounded-full font-bold transition ${
-                          categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </section>
-
-              {/* PRODUTOS — AGORA MOSTRA A PRIMEIRA FOTO DO ARRAY NA HOME */}
-              <section id="produtos" className="py-20 bg-white">
-                <div className="container mx-auto px-6">
-                  <h2 className="text-5xl font-bold text-center mb-16 text-[#0F1B3F]">
-                    Nossa Coleção Premium
-                  </h2>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {filtered.map(produto => {
-        // PEGA A PRIMEIRA FOTO DO ARRAY OU A ANTIGA
-        const fotoPrincipal = 
-          produto.imagens && produto.imagens.length > 0 
-            ? produto.imagens[0] 
-            : produto.imagem || 'https://i.ibb.co/0s0qQ6Q/placeholder-queen.jpg';
-
-        return (
-          <div 
-            key={produto.id} 
-            className="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-300"
-          >
-            <Link to={`/produto/${produto.id}`}>
-              <div 
-                className="aspect-square bg-cover bg-center relative"
-                style={{ backgroundImage: `url(${fotoPrincipal})` }}
-              >
-                {/* BADGE */}
-                {produto.badge && (
-                  <span className="absolute top-3 left-3 bg-[#0F1B3F] text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                    {produto.badge}
-                  </span>
-                )}
-
-                {/* POUCAS UNIDADES */}
-                {produto.estoque <= 5 && produto.estoque > 0 && (
-                  <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full animate-pulse font-bold shadow-lg">
-                    Poucas unidades!
-                  </span>
-                )}
-
-                {/* ESGOTADO */}
-                {produto.estoque === 0 && (
-                  <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center">
-                    <span className="text-white font-bold text-2xl tracking-wider">
-                      ESGOTADO
-                    </span>
-                  </div>
-                )}
-              </div>
-            </Link>
-
-            <div className="p-4">
-              <h3 className="font-bold text-sm line-clamp-2 mb-2 text-gray-800">
-                {produto.nome}
-              </h3>
-              <p className="text-[#0F1B3F] font-bold text-xl mb-4">
-                R$ {parseFloat(produto.preco).toFixed(2)}
-              </p>
-
-              <button
-                onClick={() => produto.estoque > 0 && addToCart(produto, 1)}
-                disabled={produto.estoque === 0}
-                className={`w-full py-3 rounded-full font-bold transition-all ${
-                  produto.estoque === 0
-                    ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                    : 'bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] hover:shadow-xl'
-                }`}
-              >
-                {produto.estoque === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
+      {/* ÁREA DO CLIENTE — AGORA USA cliente E logout! */}
+{cliente ? (
+  <div className="flex items-center gap-4">
+    <span className="font-medium">Olá, {cliente.nome}!</span>
+    <Link to="/minha-conta" className="text-primary font-bold hover:underline">Minha Conta</Link>
+    <button onClick={logout} className="text-gray-600 hover:text-gray-800 font-medium">Sair</button>
   </div>
-</section>
+) : (
+  <button 
+    onClick={() => setModalOpen(true)}
+    className="bg-primary text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition shadow-xl"
+  >
+    Minha Conta
+  </button>
+)}
+    </nav>
+  </div>
+</header>
+
+          {/* MODAL DE LOGIN — AGORA USADO! */}
+            <LoginModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
+            <Routes>
+  <Route path="/privacidade" element={<Privacidade />} />
+  <Route path="/termos" element={<Termos />} />
+  <Route path="/minha-conta" element={<MinhaConta />} />
+
+  {/* HOME — COM HERO, FILTROS, PRODUTOS, AVALIAÇÕES, CONTATO E FOOTER */}
+  <Route path="/" element={
+    <>
+      {/* HERO COM VÍDEO DE FUNDO */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <video autoPlay loop muted playsInline className="absolute w-full h-full object-cover">
+          <source src="/videos/fundo-hero.mp4" type="video/mp4" />
+          Seu navegador não suporta vídeo.
+        </video>
+
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 via-pink-900/70 to-transparent"></div>
+
+        <div className="relative z-10 container mx-auto px-6 text-center text-white">
+          <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight animate-fade-in">
+            Cuidado Natural<br />para Sua Pele
+          </h2>
+          <p className="text-xl md:text-2xl mb-10 opacity-90">
+            Sabonetes artesanais • 100% naturais • Feitos com amor e poder
+          </p>
+          <Link to="/#produtos" className="inline-block bg-white text-primary px-12 py-6 rounded-full text-2xl font-bold hover:scale-110 transition shadow-2xl hover:shadow-purple-500/50">
+            Conheça a Coleção
+          </Link>
+        </div>
+
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <svg className="w-10 h-10 text-white opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      </section>
+
+      {/* FILTROS DINÂMICOS */}
+      <section className="py-8 bg-gray-100 border-b">
+        <div className="container mx-auto px-6">
+          <div className="flex justify-center gap-4 flex-wrap">
+            <button onClick={() => setCategoria('all')} className={`px-8 py-3 rounded-full font-bold transition ${categoria === 'all' ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}>
+              Todos
+            </button>
+            {categorias.map(cat => (
+              <button key={cat} onClick={() => setCategoria(cat)} className={`px-8 py-3 rounded-full font-bold transition ${categoria === cat ? 'bg-[#0F1B3F] text-white' : 'bg-white text-gray-700 hover:bg-gray-200'}`}>
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUTOS */}
+      <section id="produtos" className="py-20 bg-white">
+        <div className="container mx-auto px-6">
+          <h2 className="text-5xl font-bold text-center mb-16 text-[#0F1B3F]">Nossa Coleção Premium</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {filtered.map(produto => {
+              const fotoPrincipal = produto.imagens?.[0] || produto.imagem || 'https://i.ibb.co/0s0qQ6Q/placeholder-queen.jpg';
+
+              return (
+                <div key={produto.id} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-300">
+                  <Link to={`/produto/${produto.id}`}>
+                    <div className="aspect-square bg-cover bg-center relative" style={{ backgroundImage: `url(${fotoPrincipal})` }}>
+                      {produto.badge && (
+                        <span className="absolute top-3 left-3 bg-[#0F1B3F] text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
+                          {produto.badge}
+                        </span>
+                      )}
+                      {produto.estoque <= 5 && produto.estoque > 0 && (
+                        <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full animate-pulse font-bold shadow-lg">
+                          Poucas unidades!
+                        </span>
+                      )}
+                      {produto.estoque === 0 && (
+                        <div className="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center">
+                          <span className="text-white font-bold text-2xl tracking-wider">ESGOTADO</span>
+                        </div>
+                      )}
+                    </div>
+                  </Link>
+
+                  <div className="p-4">
+                    <h3 className="font-bold text-sm line-clamp-2 mb-2 text-gray-800">{produto.nome}</h3>
+                    <p className="text-[#0F1B3F] font-bold text-xl mb-4">R$ {parseFloat(produto.preco).toFixed(2)}</p>
+                    <button
+                      onClick={() => produto.estoque > 0 && addToCart(produto, 1)}
+                      disabled={produto.estoque === 0}
+                      className={`w-full py-3 rounded-full font-bold transition-all ${produto.estoque === 0 ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-[#0F1B3F] text-white hover:bg-[#1a2d5e] hover:shadow-xl'}`}
+                    >
+                      {produto.estoque === 0 ? 'Esgotado' : 'Adicionar ao Carrinho'}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
 {/* AVALIAÇÕES — AGORA COM DEPOIMENTOS REAIS DAS CLIENTES */}
 
@@ -426,25 +403,18 @@ if (loading) {
                     <h3 className="text-4xl font-bold mb-4">🎄Queen Store</h3>
                     <p className="text-gray-400 mb-6">Se cuidar é reinar.</p>
                     <p className="text-sm">© 2025 Queen Store • Todos os direitos reservados • Feito com amor no Brasil</p>
+                    <div className="flex gap-8 justify-center mt-8">
+                      <Link to="/privacidade" className="text-gray-400 hover:underline">Política de Privacidade</Link>
+                      <Link to="/termos" className="text-gray-400 hover:underline">Termos de Uso</Link>
+                    </div>
                   </div>
                 </footer>
               </>
             } />
 
-            <Route path="/carrinho" element={<Carrinho />} />
-            <Route path="/produto/:id" element={<ProdutoDetalhe />} />
-            <Route path="/admin" element={<AdminLogin />} />
-            <Route path="/admin/dashboard" element={
-              localStorage.getItem('admin-logado') ? <AdminDashboard /> : <Navigate to="/admin" />
-            } />
-            <Route path="/admin/cadastrar" element={
-              localStorage.getItem('admin-logado') ? <CadastrarProduto /> : <Navigate to="/admin" />
-            } />
-            <Route path="/admin/estoque" element={
-              localStorage.getItem('admin-logado') ? <ControleEstoque /> : <Navigate to="/admin" />
-            } />
-
-            <Route path="/favoritos" element={
+  <Route path="/carrinho" element={<Carrinho />} />
+  <Route path="/produto/:id" element={<ProdutoDetalhe />} />
+  <Route path="/favoritos" element={
               <div className="min-h-screen bg-gray-50 py-20">
                 <div className="container mx-auto px-6">
                   <h1 className="text-5xl font-bold text-primary text-center mb-16">Seus Favoritos</h1>
@@ -472,17 +442,14 @@ if (loading) {
               </div>
             } />
 
-            <Route 
-              path="/admin/pedidos" 
-              element={
-                localStorage.getItem('admin-logado') === 'true' 
-            ? <Pedidos /> 
-            : <Navigate to="/admin" />
-        } 
-      />
+  <Route path="/admin" element={<AdminLogin />} />
+  <Route path="/admin/dashboard" element={localStorage.getItem('admin-logado') ? <AdminDashboard /> : <Navigate to="/admin" />} />
+  <Route path="/admin/cadastrar" element={localStorage.getItem('admin-logado') ? <CadastrarProduto /> : <Navigate to="/admin" />} />
+  <Route path="/admin/estoque" element={localStorage.getItem('admin-logado') ? <ControleEstoque /> : <Navigate to="/admin" />} />
+  <Route path="/admin/pedidos" element={localStorage.getItem('admin-logado') === 'true' ? <Pedidos /> : <Navigate to="/admin" />} />
+</Routes>
 
-          </Routes>
-        </div>
+    </div>
       </CarrinhoContext.Provider>
     </FavoritosContext.Provider>
   );
@@ -490,9 +457,11 @@ if (loading) {
 
 export default function App() {
   return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
     <Router>
       <AppContent />
       <SpeedInsights apiKey="vck_3jIZl0d8gS3CGvUi1rDhQ2ifKf0AH5b3rOO7e7MuOjLiUTcBEH1Z2hWlERE" />
     </Router>
+    </GoogleOAuthProvider>
   );
 }
