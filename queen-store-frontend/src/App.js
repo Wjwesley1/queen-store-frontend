@@ -18,6 +18,7 @@ import { useAuth } from './context/AuthContext';
 import Carrinho from './pages/Carrinho';
 import ProdutoDetalhe from './pages/ProdutoDetalhe';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import VerifyAccount from './pages/VerifyAccount.jsx';
 
 // ==================== CONTEXTS ====================
 const CarrinhoContext = createContext();
@@ -232,12 +233,12 @@ if (loading) {
 
           {/* MODAL DE LOGIN — AGORA USADO! */}
             <LoginModal open={modalOpen} onClose={() => setModalOpen(false)} />
-
+              
             <Routes>
   <Route path="/privacidade" element={<Privacidade />} />
   <Route path="/termos" element={<Termos />} />
   <Route path="/minha-conta" element={<MinhaConta />} />
-
+  <Route path="/verify/:token" element={<VerifyAccount />} />
   {/* HOME — COM HERO, FILTROS, PRODUTOS, AVALIAÇÕES, CONTATO E FOOTER */}
   <Route path="/" element={
     <>

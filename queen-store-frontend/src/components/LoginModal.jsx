@@ -114,6 +114,27 @@ export default function LoginModal({ open, onClose }) {
         >
           ×
         </button>
+
+        <div className="my-8 text-center">
+  <p className="text-gray-600 mb-2">Não recebeu o email de confirmação?</p>
+  <button 
+    onClick={async () => {
+      if (!form.email) {
+        setError('Digite seu email primeiro!');
+        return;
+      }
+      try {
+        await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/resend-verification`, { email: form.email });
+        setError('Email de confirmação reenviado! Confira caixa de entrada ou spam 💜');
+      } catch (err) {
+        setError(err.response?.data?.erro || 'Erro ao reenviar');
+      }
+    }}
+    className="text-[#0F1B3F] underline font-bold hover:text-pink-600 transition"
+  >
+    Reenviar Email de Confirmação
+  </button>
+</div>
       </div>
     </div>
   );
