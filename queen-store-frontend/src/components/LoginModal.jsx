@@ -9,6 +9,7 @@ export default function LoginModal({ open, onClose }) {
   const [form, setForm] = useState({ nome: '', email: '', senha: '' });
   const [error, setError] = useState('');
   const { login } = useAuth();
+  
 
   if (!open) return null;
 
