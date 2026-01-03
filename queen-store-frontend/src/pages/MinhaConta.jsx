@@ -35,22 +35,34 @@ export default function MinhaConta() {
   }, [cliente, API_URL]);
 
   const salvarEndereco = async () => {
-    setSuccessMsg('');
-    setErrorMsg('');
+  setSuccessMsg('');
+  setErrorMsg('');
 
-    // Valida CEP
-    if (endereco.cep && !/^\d{5}-\d{3}$/.test(endereco.cep)) {
-      setErrorMsg('CEP inválido! Use o formato 00000-000');
-      return;
-    }
+  // Validação básica de CEP
+  if (endereco.cep && !/^\d{5}-\d{3}$/.test(endereco.cep)) {
+    setErrorMsg('CEP inválido! Use o formato 00000-000');
+    return;
+  }
 
-    try {
-      await axios.patch(`${API_URL}/api/cliente/endereco`, endereco);
+  try {
+    const res = await axios.patch(`${API_URL}/api/cliente/endereco`, endereco, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('queen_token')}` // se precisar de token
+      }
+    });
+
+    if (res.data.sucesso) {
       setSuccessMsg('Endereço salvo com sucesso! 💜');
-    } catch (err) {
-      setErrorMsg(err.response?.data?.erro || 'Erro ao salvar endereço 😔');
     }
-  };
+  } catch (err) {
+    console.error('Erro completo:', err);
+    setErrorMsg(
+      err.response?.data?.erro || 
+      err.message || 
+      'Erro ao salvar endereço. Verifique conexão ou tente novamente 😔'
+    );
+  }
+};
 
   if (loading) return <p className="text-center text-3xl mt-20">Carregando...</p>;
   if (!cliente) return <Navigate to="/" />;
@@ -251,6 +263,12 @@ export default function MinhaConta() {
                   >
                     Salvar Endereço
                   </button>
+
+                  <div className="text-center mt-6">
+  {successMsg && <p className="text-green-600 font-bold text-xl">{successMsg}</p>}
+  {errorMsg && <p className="text-red-600 font-bold text-xl">{errorMsg}</p>}
+</div>
+
                 </div>
               </div>
             )}

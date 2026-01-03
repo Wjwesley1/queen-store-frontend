@@ -9,21 +9,6 @@ export default function LoginModal({ open, onClose }) {
   const [form, setForm] = useState({ nome: '', email: '', senha: '' });
   const [error, setError] = useState('');
   const { login } = useAuth();
-  const cors = require('cors');
-
-app.use(cors({
-  origin: [
-    'http://localhost:3000',          // desenvolvimento
-    'https://queen-store-frontend.vercel.app',  // produção
-    'https://queen-store.onrender.com',
-    'www.queenstore.store'
-    // adiciona outras origens se precisar
-  ],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-session-id'],
-  credentials: true // se precisar enviar cookies
-}));
-
 
   if (!open) return null;
 
