@@ -6,15 +6,14 @@ import { Navigate, Link } from 'react-router-dom';
 export default function MinhaConta() {
   const { cliente, loading } = useAuth();
   const [pedidos, setPedidos] = useState([]);
-  const [desejos, setDesejos] = useState([]); // quando implementar desejos
-  const [endereco, setEndereco] = useState({
-    whatsapp: '',
-    endereco: '',
-    cidade: '',
-    estado: '',
-    cep: '',
-    complemento: ''
-  });
+  const [desejos, setDesejos] = useState([]); // futuro
+
+  // Estados para múltiplos endereços
+  const [enderecos, setEnderecos] = useState([]); // lista completa
+  const [showForm, setShowForm] = useState(false); // mostra/esconde form
+  const [isEditing, setIsEditing] = useState(false); // edição ou novo
+  const [formEndereco, setFormEndereco] = useState({}); // dados atuais no form
+
   const [openEndereco, setOpenEndereco] = useState(false);
   const [openCadastro, setOpenCadastro] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
@@ -24,45 +23,64 @@ export default function MinhaConta() {
 
   useEffect(() => {
     if (cliente) {
+      // Pedidos
       axios.get(`${API_URL}/api/cliente/pedidos`)
         .then(res => setPedidos(res.data))
-        .catch(err => console.error('Erro ao carregar pedidos:', err));
+        .catch(err => console.error('Erro pedidos:', err));
 
-      axios.get(`${API_URL}/api/cliente/endereco`)
-        .then(res => setEndereco(res.data || {}))
-        .catch(err => console.error('Erro ao carregar endereço:', err));
+      // Carrega lista de endereços (quando abre a seção)
+      if (openEndereco) {
+        axios.get(`${API_URL}/api/cliente/enderecos`)
+          .then(res => setEnderecos(res.data || []))
+          .catch(err => console.error('Erro endereços:', err));
+      }
+
+      if (cliente && openEndereco) {
+    axios.get(`${API_URL}/api/cliente/enderecos`)
+      .then(res => setEnderecos(res.data || []))
+      .catch(err => console.error('Erro ao carregar endereços:', err));
+  }
     }
-  }, [cliente, API_URL]);
+  }, [cliente, API_URL, openEndereco]);
 
   const salvarEndereco = async () => {
-  setSuccessMsg('');
-  setErrorMsg('');
+    setSuccessMsg('');
+    setErrorMsg('');
 
-  // Validação básica de CEP
-  if (endereco.cep && !/^\d{5}-\d{3}$/.test(endereco.cep)) {
-    setErrorMsg('CEP inválido! Use o formato 00000-000');
-    return;
-  }
-
-  try {
-    const res = await axios.patch(`${API_URL}/api/cliente/endereco`, endereco, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('queen_token')}` // se precisar de token
-      }
-    });
-
-    if (res.data.sucesso) {
-      setSuccessMsg('Endereço salvo com sucesso! 💜');
+    if (formEndereco.cep && !/^\d{5}-\d{3}$/.test(formEndereco.cep)) {
+      setErrorMsg('CEP inválido! Use 00000-000');
+      return;
     }
-  } catch (err) {
-    console.error('Erro completo:', err);
-    setErrorMsg(
-      err.response?.data?.erro || 
-      err.message || 
-      'Erro ao salvar endereço. Verifique conexão ou tente novamente 😔'
-    );
-  }
-};
+
+    try {
+      if (isEditing) {
+      await axios.patch(`${API_URL}/api/cliente/enderecos/${formEndereco.id}`, formEndereco);
+    } else {
+      await axios.post(`${API_URL}/api/cliente/enderecos`, formEndereco);
+    }
+
+      setSuccessMsg('Endereço salvo!');
+      setShowForm(false);
+
+      // Recarrega lista
+      const res = await axios.get(`${API_URL}/api/cliente/enderecos`);
+      setEnderecos(res.data);
+    } catch (err) {
+      setErrorMsg(err.response?.data?.erro || 'Erro ao salvar');
+    }
+  };
+
+  const handleExcluirEndereco = async (id) => {
+    if (!window.confirm('Tem certeza que deseja excluir este endereço?')) return;
+
+    try {
+      await axios.delete(`${API_URL}/api/cliente/enderecos/${id}`);
+      setEnderecos(prev => prev.filter(e => e.id !== id));
+      setSuccessMsg('Endereço excluído!');
+    } catch (err) {
+      setErrorMsg('Erro ao excluir');
+    }
+  };
 
   if (loading) return <p className="text-center text-3xl mt-20">Carregando...</p>;
   if (!cliente) return <Navigate to="/" />;
@@ -76,7 +94,7 @@ export default function MinhaConta() {
           <p className="text-xl text-gray-700 mt-4">Bem-vinda de volta, rainha!</p>
         </div>
 
-        {/* PEDIDOS - SEMPRE VISÍVEL */}
+        {/* PEDIDOS */}
         <div className="bg-white rounded-3xl shadow-2xl p-10 mb-12">
           <h2 className="text-4xl font-bold text-[#0F1B3F] mb-8 text-center">Meus Pedidos</h2>
           {pedidos.length === 0 ? (
@@ -116,7 +134,7 @@ export default function MinhaConta() {
           )}
         </div>
 
-        {/* DESEJOS - SEMPRE VISÍVEL */}
+        {/* DESEJOS */}
         <div className="bg-white rounded-3xl shadow-2xl p-10 mb-12">
           <h2 className="text-4xl font-bold text-[#0F1B3F] mb-8 text-center">Meus Desejos 💜</h2>
           {desejos.length === 0 ? (
@@ -130,151 +148,195 @@ export default function MinhaConta() {
 
         {/* SEÇÕES OCULTAS */}
         <div className="space-y-6">
-          {/* MEU ENDEREÇO DE ENTREGA */}
+          {/* MEUS ENDEREÇOS */}
           <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
             <button 
               onClick={() => setOpenEndereco(!openEndereco)}
               className="w-full p-8 text-left flex justify-between items-center text-3xl font-bold text-[#0F1B3F] hover:bg-gray-50 transition"
             >
-              <span>Meu Endereço de Entrega</span>
+              <span>Meus Endereços de Entrega</span>
               <span className="text-4xl">{openEndereco ? '−' : '+'}</span>
             </button>
 
             {openEndereco && (
               <div className="p-10 pt-0">
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* WHATSAPP */}
-                  <div>
-                    <label className="block text-gray-700 font-bold mb-2">WhatsApp</label>
-                    <input 
-                      type="tel" 
-                      placeholder="(31) 99999-9999" 
-                      value={endereco.whatsapp || ''} 
-                      onChange={e => setEndereco({...endereco, whatsapp: e.target.value})} 
-                      className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
-                    />
-                  </div>
+                {/* Botão Adicionar Novo */}
+                <button 
+                  onClick={() => {
+                    setFormEndereco({}); // limpa
+                    setIsEditing(false);
+                    setShowForm(true);
+                  }}
+                  className="mb-8 bg-gradient-to-r from-[#0F1B3F] to-[#1a2d5e] text-white px-8 py-4 rounded-full font-bold hover:scale-105 transition shadow-xl"
+                >
+                  + Adicionar Novo Endereço
+                </button>
 
-                  {/* CEP COM VALIDAÇÃO E AUTO-PREENCIMENTO */}
-                  <div>
-                    <label className="block text-gray-700 font-bold mb-2">CEP</label>
-                    <input 
-                      type="text"
-                      placeholder="00000-000"
-                      value={endereco.cep || ''}
-                      onChange={async (e) => {
-                        let value = e.target.value.replace(/\D/g, '');
-                        if (value.length > 5) value = value.slice(0, 5) + '-' + value.slice(5);
-                        setEndereco(prev => ({ ...prev, cep: value }));
+                {/* FORMULÁRIO */}
+                {showForm && (
+                  <div className="mb-10 p-6 bg-gray-50 rounded-2xl border border-gray-200">
+                    <h3 className="text-2xl font-bold text-[#0F1B3F] mb-6">
+                      {isEditing ? 'Editar Endereço' : 'Novo Endereço'}
+                    </h3>
 
-                        if (value.replace('-', '').length === 8) {
-                          try {
-                            const cepLimpo = value.replace('-', '');
-                            const res = await axios.get(`https://viacep.com.br/ws/${cepLimpo}/json/`);
-                            if (!res.data.erro) {
-                              setEndereco(prev => ({
-                                ...prev,
-                                endereco: res.data.logradouro || prev.endereco,
-                                cidade: res.data.localidade || prev.cidade,
-                                estado: res.data.uf || prev.estado,
-                              }));
-                              setSuccessMsg('Endereço encontrado! Preenchido automaticamente 💜');
-                            } else {
-                              setErrorMsg('CEP não encontrado');
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* APELIDO */}
+                      <div className="md:col-span-2">
+                        <label className="block text-gray-700 font-bold mb-2">Apelido (opcional)</label>
+                        <input 
+                          type="text" 
+                          value={formEndereco.apelido || ''} 
+                          onChange={e => setFormEndereco({...formEndereco, apelido: e.target.value})} 
+                          className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
+                        />
+                      </div>
+
+                      {/* CEP */}
+                      <div>
+                        <label className="block text-gray-700 font-bold mb-2">CEP</label>
+                        <input 
+                          type="text"
+                          placeholder="00000-000"
+                          value={formEndereco.cep || ''}
+                          onChange={async (e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length > 5) value = value.slice(0, 5) + '-' + value.slice(5);
+                            setFormEndereco(prev => ({ ...prev, cep: value }));
+
+                            if (value.replace('-', '').length === 8) {
+                              try {
+                                const cepLimpo = value.replace('-', '');
+                                const res = await axios.get(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+                                if (!res.data.erro) {
+                                  setFormEndereco(prev => ({
+                                    ...prev,
+                                    endereco: res.data.logradouro || prev.endereco,
+                                    cidade: res.data.localidade || prev.cidade,
+                                    estado: res.data.uf || prev.estado,
+                                  }));
+                                }
+                              } catch (err) {
+                                console.error(err);
+                              }
                             }
-                          } catch (err) {
-                            console.error('Erro ViaCEP:', err);
-                          }
-                        }
-                      }}
-                      maxLength={9}
-                      className={`w-full px-6 py-4 rounded-xl border-4 transition text-xl ${
-                        endereco.cep && endereco.cep.replace('-', '').length === 8 
-                          ? 'border-green-500' 
-                          : endereco.cep && endereco.cep.length > 0 
-                          ? 'border-red-500' 
-                          : 'border-[#0F1B3F]'
-                      } focus:border-pink-500`}
-                      required
-                    />
-                    {errorMsg && <p className="text-red-600 text-sm mt-1">{errorMsg}</p>}
-                    {successMsg && <p className="text-green-600 text-sm mt-1">{successMsg}</p>}
+                          }}
+                          maxLength={9}
+                          className={`w-full px-6 py-4 rounded-xl border-4 transition text-xl ${
+                            formEndereco.cep && formEndereco.cep.replace('-', '').length === 8 
+                              ? 'border-green-500' 
+                              : formEndereco.cep && formEndereco.cep.length > 0 
+                              ? 'border-red-500' 
+                              : 'border-[#0F1B3F]'
+                          } focus:border-pink-500`}
+                          required
+                        />
+                      </div>
+
+                      {/* RUA */}
+                      <div>
+                        <label className="block text-gray-700 font-bold mb-2">Rua / Número / Bairro</label>
+                        <input 
+                          type="text" 
+                          value={formEndereco.endereco || ''} 
+                          onChange={e => setFormEndereco({...formEndereco, endereco: e.target.value})} 
+                          className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
+                        />
+                      </div>
+
+                      {/* CIDADE */}
+                      <div>
+                        <label className="block text-gray-700 font-bold mb-2">Cidade</label>
+                        <input 
+                          type="text" 
+                          value={formEndereco.cidade || ''} 
+                          onChange={e => setFormEndereco({...formEndereco, cidade: e.target.value})} 
+                          className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
+                        />
+                      </div>
+
+                      {/* ESTADO */}
+                      <div>
+                        <label className="block text-gray-700 font-bold mb-2">Estado</label>
+                        <input 
+                          type="text" 
+                          maxLength={2}
+                          value={formEndereco.estado || ''} 
+                          onChange={e => setFormEndereco({...formEndereco, estado: e.target.value.toUpperCase()})} 
+                          className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
+                        />
+                      </div>
+
+                      {/* COMPLEMENTO */}
+                      <div className="md:col-span-2">
+                        <label className="block text-gray-700 font-bold mb-2">Complemento (opcional)</label>
+                        <input 
+                          type="text" 
+                          value={formEndereco.complemento || ''} 
+                          onChange={e => setFormEndereco({...formEndereco, complemento: e.target.value})} 
+                          className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="text-center mt-10 space-x-4">
+                      <button 
+                        onClick={salvarEndereco}
+                        className="bg-gradient-to-r from-[#0F1B3F] to-[#1a2d5e] text-white px-12 py-5 rounded-full text-xl font-bold hover:scale-105 transition shadow-xl"
+                      >
+                        Salvar Endereço
+                      </button>
+                      <button 
+                        onClick={() => setShowForm(false)}
+                        className="bg-gray-300 text-gray-800 px-12 py-5 rounded-full text-xl font-bold hover:bg-gray-400 transition"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   </div>
+                )}
 
-                  {/* RUA / NÚMERO / BAIRRO */}
-                  <div>
-                    <label className="block text-gray-700 font-bold mb-2">Rua / Número / Bairro</label>
-                    <input 
-                      type="text" 
-                      placeholder="Rua Exemplo, 123 - Bairro" 
-                      value={endereco.endereco || ''} 
-                      onChange={e => setEndereco({...endereco, endereco: e.target.value})} 
-                      className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
-                    />
+                {/* LISTA */}
+                {enderecos.length === 0 ? (
+                  <p className="text-center text-xl text-gray-600">Você ainda não tem endereços salvos</p>
+                ) : (
+                  <div className="space-y-6">
+                    {enderecos.map(end => (
+                      <div key={end.id} className={`p-6 rounded-2xl border-2 flex justify-between items-start ${end.principal ? 'border-[#0F1B3F] bg-purple-50' : 'border-gray-200'}`}>
+                        <div>
+                          <h3 className="font-bold text-xl">{end.apelido || 'Endereço'}</h3>
+                          {end.principal && <span className="text-sm text-green-600 font-bold">Principal</span>}
+                          <p className="mt-2">{end.endereco}</p>
+                          <p>{end.cidade}, {end.estado} - {end.cep}</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <button 
+                            onClick={() => {
+                              setFormEndereco(end);
+                              setIsEditing(true);
+                              setShowForm(true);
+                            }}
+                            className="text-blue-600 hover:text-blue-800 text-2xl"
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                          <button 
+                            onClick={() => handleExcluirEndereco(end.id)}
+                            className="text-red-600 hover:text-red-800 text-2xl"
+                            title="Excluir"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-
-                  {/* CIDADE */}
-                  <div>
-                    <label className="block text-gray-700 font-bold mb-2">Cidade</label>
-                    <input 
-                      type="text" 
-                      placeholder="Cidade" 
-                      value={endereco.cidade || ''} 
-                      onChange={e => setEndereco({...endereco, cidade: e.target.value})} 
-                      className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
-                    />
-                  </div>
-
-                  {/* ESTADO */}
-                  <div>
-                    <label className="block text-gray-700 font-bold mb-2">Estado</label>
-                    <input 
-                      type="text" 
-                      placeholder="MG" 
-                      maxLength={2}
-                      value={endereco.estado || ''} 
-                      onChange={e => setEndereco({...endereco, estado: e.target.value.toUpperCase()})} 
-                      className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
-                    />
-                  </div>
-
-                  {/* COMPLEMENTO */}
-                  <div className="md:col-span-2">
-                    <label className="block text-gray-700 font-bold mb-2">Complemento (opcional)</label>
-                    <input 
-                      type="text" 
-                      placeholder="Apt, bloco, referência" 
-                      value={endereco.complemento || ''} 
-                      onChange={e => setEndereco({...endereco, complemento: e.target.value})} 
-                      className="w-full px-6 py-4 rounded-xl border-4 border-[#0F1B3F] focus:border-pink-500 transition text-xl"
-                    />
-                  </div>
-                </div>
-
-                <div className="text-center mt-10">
-                  <button 
-                    onClick={salvarEndereco}
-                    disabled={endereco.cep && !/^\d{5}-\d{3}$/.test(endereco.cep)}
-                    className={`px-16 py-6 rounded-full text-2xl font-bold transition shadow-2xl ${
-                      endereco.cep && !/^\d{5}-\d{3}$/.test(endereco.cep)
-                        ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-[#0F1B3F] to-[#1a2d5e] text-white hover:scale-105'
-                    }`}
-                  >
-                    Salvar Endereço
-                  </button>
-
-                  <div className="text-center mt-6">
-  {successMsg && <p className="text-green-600 font-bold text-xl">{successMsg}</p>}
-  {errorMsg && <p className="text-red-600 font-bold text-xl">{errorMsg}</p>}
-</div>
-
-                </div>
+                )}
               </div>
             )}
           </div>
 
-          {/* ALTERAR CADASTRO - OCULTO */}
+          {/* ALTERAR CADASTRO */}
           <div className="bg-white rounded-3xl shadow-2xl overflow-hidden mt-12">
             <button 
               onClick={() => setOpenCadastro(!openCadastro)}
