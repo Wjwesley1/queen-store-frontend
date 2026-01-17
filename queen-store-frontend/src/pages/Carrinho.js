@@ -1,8 +1,9 @@
-// src/pages/Carrinho.js — VERSÃO FINAL COM MODAL + ZERA CARRINHO + NOVA SESSÃO
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+// src/pages/Carrinho.jsx — VERSÃO FINAL COM INTEGRAÇÃO DE DADOS LOGADO + CONFIRMAÇÃO RÁPIDA
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCarrinho } from '../App';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = 'https://queen-store-api.onrender.com';
 
@@ -14,13 +15,40 @@ const isValidEmail = (email) => {
 
 export default function Carrinho() {
   const { carrinho, carregarCarrinho } = useCarrinho();
+  const { cliente } = useAuth(); // pega se está logado
+  const navigate = useNavigate();
 
   const [modalAberto, setModalAberto] = useState(false);
   const [dadosCliente, setDadosCliente] = useState({
     nome: '',
     email: '',
-    whatsapp: ''
+    whatsapp: '',
+    endereco: '',
+    cep: '',
+    cidade: '',
+    estado: '',
+    complemento: ''
   });
+
+  const [isLoadingDados, setIsLoadingDados] = useState(false);
+
+  // Se logado, carrega dados automaticamente
+  useEffect(() => {
+    if (cliente && modalAberto) {
+      setIsLoadingDados(true);
+      axios.get(`${API_URL}/api/cliente/dados`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('queen_token')}` }
+      })
+        .then(res => {
+          setDadosCliente(res.data || {}); // preenche tudo que vier
+          setIsLoadingDados(false);
+        })
+        .catch(err => {
+          console.error('Erro ao carregar dados do cliente:', err);
+          setIsLoadingDados(false);
+        });
+    }
+  }, [cliente, modalAberto]);
 
   const updateQuantidade = async (produto_id, novaQuantidade) => {
     const sessionId = localStorage.getItem('queen_session') || '';
@@ -56,11 +84,16 @@ export default function Carrinho() {
     const sessionId = localStorage.getItem('queen_session') || '';
 
     try {
-      // 1. SALVA O PEDIDO NO BANCO
+      // 1. SALVA O PEDIDO NO BANCO (com dados do cliente logado ou preenchidos)
       await axios.post(`${API_URL}/api/pedidos`, {
         cliente_nome: dadosCliente.nome,
         cliente_whatsapp: dadosCliente.whatsapp.replace(/\D/g, ''),
         cliente_email: dadosCliente.email || 'Não informado',
+        endereco: dadosCliente.endereco || 'Não informado',
+        cep: dadosCliente.cep || 'Não informado',
+        cidade: dadosCliente.cidade || 'Não informado',
+        estado: dadosCliente.estado || 'Não informado',
+        complemento: dadosCliente.complemento || '',
         itens: carrinho.map(i => ({
           nome: i.nome,
           quantidade: i.quantidade,
@@ -87,7 +120,7 @@ export default function Carrinho() {
 
       // 5. ALERTA DE SUCESSO
       const alert = document.createElement('div');
-      alert.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-600 text-white px-12 py-6 rounded-full shadow-2xl z-50 text-3xl font-bold animate-pulse';
+      alert.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-12 py-6 rounded-full shadow-2xl z-50 text-3xl font-bold animate-pulse';
       alert.textContent = 'PEDIDO ENVIADO COM SUCESSO!';
       document.body.appendChild(alert);
       setTimeout(() => alert.remove(), 5000);
@@ -190,62 +223,113 @@ export default function Carrinho() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6">
           <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 max-w-xl w-full">
             <h2 className="text-3xl md:text-4xl font-bold text-[#0F1B3F] text-center mb-6 md:mb-8">
-              Quase lá, rainha!
+              {cliente ? 'Confirme seus dados, rainha!' : 'Quase lá, rainha!'}
             </h2>
             <p className="text-center text-lg md:text-xl text-gray-700 mb-6 md:mb-8">
-              Só falta seus dados pra gente te chamar pelo nome
+              {cliente 
+                ? 'Seus dados já estão aqui. Confirme ou edite antes de finalizar.'
+                : 'Só falta seus dados pra gente te chamar pelo nome'}
             </p>
 
-            <div className="space-y-4 md:space-y-6">
-              <input
-                type="text"
-                placeholder="Seu nome completo"
-                value={dadosCliente.nome}
-                onChange={e => setDadosCliente({...dadosCliente, nome: e.target.value})}
-                className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
-                required
-              />
-
-              <div className="relative">
+            {isLoadingDados ? (
+              <p className="text-center text-xl text-gray-600">Carregando seus dados salvos...</p>
+            ) : (
+              <div className="space-y-4 md:space-y-6">
                 <input
-                  type="email"
-                  placeholder="Seu melhor e-mail"
-                  value={dadosCliente.email}
-                  onChange={e => setDadosCliente({...dadosCliente, email: e.target.value})}
-                  className={`w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 text-lg md:text-xl focus:outline-none transition-all ${
-                    dadosCliente.email && !isValidEmail(dadosCliente.email)
-                      ? 'border-red-500 focus:border-red-600'
-                      : 'border-[#0F1B3F] focus:border-pink-500'
-                  }`}
+                  type="text"
+                  placeholder="Seu nome completo"
+                  value={dadosCliente.nome}
+                  onChange={e => setDadosCliente({...dadosCliente, nome: e.target.value})}
+                  className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                  required
                 />
-                {dadosCliente.email && !isValidEmail(dadosCliente.email) && (
-                  <p className="text-red-600 text-sm mt-2">
-                    Digite um e-mail válido
-                  </p>
+
+                <div className="relative">
+                  <input
+                    type="email"
+                    placeholder="Seu melhor e-mail (opcional)"
+                    value={dadosCliente.email}
+                    onChange={e => setDadosCliente({...dadosCliente, email: e.target.value})}
+                    className={`w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 text-lg md:text-xl focus:outline-none transition-all ${
+                      dadosCliente.email && !isValidEmail(dadosCliente.email)
+                        ? 'border-red-500 focus:border-red-600'
+                        : 'border-[#0F1B3F] focus:border-pink-500'
+                    }`}
+                  />
+                  {dadosCliente.email && !isValidEmail(dadosCliente.email) && (
+                    <p className="text-red-600 text-sm mt-2">
+                      Digite um e-mail válido
+                    </p>
+                  )}
+                </div>
+
+                <input
+                  type="tel"
+                  placeholder="WhatsApp com DDD (ex: 31988887777)"
+                  value={dadosCliente.whatsapp}
+                  onChange={e => setDadosCliente({...dadosCliente, whatsapp: e.target.value})}
+                  className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                  required
+                />
+
+                {/* Campos extras se quiser mostrar endereço logado */}
+                {cliente && (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Endereço completo"
+                      value={dadosCliente.endereco}
+                      onChange={e => setDadosCliente({...dadosCliente, endereco: e.target.value})}
+                      className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="CEP"
+                      value={dadosCliente.cep}
+                      onChange={e => setDadosCliente({...dadosCliente, cep: e.target.value})}
+                      className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Cidade"
+                      value={dadosCliente.cidade}
+                      onChange={e => setDadosCliente({...dadosCliente, cidade: e.target.value})}
+                      className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Estado (UF)"
+                      value={dadosCliente.estado}
+                      onChange={e => setDadosCliente({...dadosCliente, estado: e.target.value})}
+                      className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                    />
+
+                    <input
+                      type="text"
+                      placeholder="Complemento (opcional)"
+                      value={dadosCliente.complemento}
+                      onChange={e => setDadosCliente({...dadosCliente, complemento: e.target.value})}
+                      className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
+                    />
+                  </>
                 )}
               </div>
-
-              <input
-                type="tel"
-                placeholder="WhatsApp com DDD (ex: 31988887777)"
-                value={dadosCliente.whatsapp}
-                onChange={e => setDadosCliente({...dadosCliente, whatsapp: e.target.value})}
-                className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
-                required
-              />
-            </div>
+            )}
 
             <div className="flex gap-4 md:gap-6 mt-8 md:mt-10">
               <button
                 onClick={salvarPedidoEFinalizar}
-                disabled={!dadosCliente.nome || !dadosCliente.whatsapp || (dadosCliente.email && !isValidEmail(dadosCliente.email))}
+                disabled={!dadosCliente.nome || !dadosCliente.whatsapp || (dadosCliente.email && !isValidEmail(dadosCliente.email)) || isLoadingDados}
                 className={`flex-1 py-4 md:py-5 rounded-full text-lg md:text-2xl font-bold transition-all ${
-                  !dadosCliente.nome || !dadosCliente.whatsapp || (dadosCliente.email && !isValidEmail(dadosCliente.email))
+                  !dadosCliente.nome || !dadosCliente.whatsapp || (dadosCliente.email && !isValidEmail(dadosCliente.email)) || isLoadingDados
                     ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
                     : 'bg-gradient-to-r from-[#0F1B3F] to-[#1a2d5e] text-white hover:scale-105 shadow-xl'
                 }`}
               >
-                ENVIAR PEDIDO
+                {isLoadingDados ? 'Carregando...' : 'Confirmar e Finalizar Pedido'}
               </button>
               <button
                 onClick={() => setModalAberto(false)}
