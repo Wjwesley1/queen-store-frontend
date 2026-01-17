@@ -16,7 +16,6 @@ const isValidEmail = (email) => {
 export default function Carrinho() {
   const { carrinho, carregarCarrinho } = useCarrinho();
   const { cliente } = useAuth(); // pega se está logado
-  const navigate = useNavigate();
 
   const [modalAberto, setModalAberto] = useState(false);
   const [dadosCliente, setDadosCliente] = useState({
