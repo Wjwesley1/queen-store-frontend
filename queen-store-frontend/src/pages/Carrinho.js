@@ -277,8 +277,8 @@ export default function Carrinho() {
                     <input
                       type="text"
                       placeholder="Endereço completo"
-                      value={dadosCliente.endereco}
-                      onChange={e => setDadosCliente({...dadosCliente, endereco: e.target.value})}
+                      value={dadosCliente.enderecos}
+                      onChange={e => setDadosCliente({...dadosCliente, enderecos: e.target.value})}
                       className="w-full px-6 md:px-8 py-4 md:py-5 rounded-xl border-4 border-[#0F1B3F] text-lg md:text-xl focus:outline-none focus:border-pink-500"
                     />
 
