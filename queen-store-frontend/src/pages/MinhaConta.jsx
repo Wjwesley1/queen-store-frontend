@@ -6,7 +6,7 @@ import { Navigate, Link } from 'react-router-dom';
 export default function MinhaConta() {
   const { cliente, loading } = useAuth();
   const [pedidos, setPedidos] = useState([]);
-  const [desejos, setDesejos] = useState([]); // futuro
+  //const [desejos, setDesejos] = useState([]); 
 
   // Estados para múltiplos endereços (lista completa)
   const [enderecos, setEnderecos] = useState([]); // ARRAY DE ENDEREÇOS
