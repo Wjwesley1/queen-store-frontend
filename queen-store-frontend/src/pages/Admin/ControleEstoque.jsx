@@ -10,6 +10,7 @@ export default function ControleEstoque() {
   const [loading, setLoading] = useState(true);
   const [editando, setEditando] = useState(null);
   const [form, setForm] = useState({});
+  const [deletando, setDeletando] = useState(null); // ID do produto aguardando confirmação
 
   useEffect(() => {
     carregarProdutos();
@@ -54,6 +55,25 @@ export default function ControleEstoque() {
     setForm({});
   };
 
+  const confirmarDelete = (id) => {
+    setDeletando(id);
+  };
+
+  const cancelarDelete = () => {
+    setDeletando(null);
+  };
+
+  const deletarProduto = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/api/produtos/${id}`);
+      setProdutos(prev => prev.filter(p => p.id !== id));
+      setDeletando(null);
+    } catch (err) {
+      alert('Erro ao excluir produto');
+      setDeletando(null);
+    }
+  };
+
   if (loading) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center text-4xl text-[#0F1B3F]">Carregando...</div>;
   }
@@ -64,8 +84,10 @@ export default function ControleEstoque() {
         <div className="bg-white rounded-3xl shadow-2xl p-10">
           <div className="flex justify-between items-center mb-10">
             <h1 className="text-5xl font-bold text-[#0F1B3F]">Controle Total de Produtos</h1>
-            <Link to="/admin/dashboard" className="bg-[#0F1B3F] text-white px-8 py-4 rounded-full hover:bg-pink-600 transition text-xl font-bold">
-              Voltar ao Painel
+            <Link to="/admin/dashboard" title="Voltar ao Painel" className="bg-[#0F1B3F] text-white p-4 rounded-full hover:bg-pink-600 transition flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
             </Link>
           </div>
 
@@ -178,13 +200,45 @@ export default function ControleEstoque() {
                             CANCELAR
                           </button>
                         </div>
+                      ) : deletando === produto.id ? (
+                        // Mini confirmação inline
+                        <div className="flex gap-2 justify-center items-center">
+                          <span className="text-sm font-bold text-red-600">Excluir?</span>
+                          <button
+                            onClick={() => deletarProduto(produto.id)}
+                            className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700 font-bold text-sm"
+                          >
+                            SIM
+                          </button>
+                          <button
+                            onClick={cancelarDelete}
+                            className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 font-bold text-sm"
+                          >
+                            NÃO
+                          </button>
+                        </div>
                       ) : (
-                        <button
-                          onClick={() => iniciarEdicao(produto)}
-                          className="bg-[#0F1B3F] text-white px-10 py-4 rounded-full hover:bg-pink-600 transition font-bold text-xl"
-                        >
-                          EDITAR PRODUTO
-                        </button>
+                        <div className="flex gap-3 justify-center items-center">
+                          <button
+                            onClick={() => iniciarEdicao(produto)}
+                            title="Editar produto"
+                            className="text-[#0F1B3F] hover:text-pink-600 transition p-2 rounded-full hover:bg-pink-50"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-1.414.586H8v-2.414a2 2 0 01.586-1.414z" />
+                            </svg>
+                          </button>
+                          {/* Ícone lixeira */}
+                          <button
+                            onClick={() => confirmarDelete(produto.id)}
+                            title="Excluir produto"
+                            className="text-gray-400 hover:text-red-600 transition p-2 rounded-full hover:bg-red-50"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
