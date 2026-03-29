@@ -35,10 +35,8 @@ export default function MinhaConta() {
   const [salvando, setSalvando] = useState(false);
   const [cepBuscando, setCepBuscando] = useState(false);
 
-  const token = localStorage.getItem('queen_token');
-  const authHeader = { headers: { Authorization: `Bearer ${token}` } };
-
   useEffect(() => {
+    const authHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('queen_token')}` } };
     if (!cliente) return;
     axios.get(`${API_URL}/api/clientes/pedidos`, authHeader)
       .then(res => setPedidos(res.data))
@@ -46,6 +44,7 @@ export default function MinhaConta() {
   }, [cliente]);
 
   useEffect(() => {
+    const authHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('queen_token')}` } };
     if (openEndereco && cliente) {
       axios.get(`${API_URL}/api/cliente/enderecos`, authHeader)
         .then(res => setEnderecos(res.data || []))
