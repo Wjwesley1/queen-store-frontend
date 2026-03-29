@@ -35,6 +35,8 @@ export default function MinhaConta() {
   const [salvando, setSalvando] = useState(false);
   const [cepBuscando, setCepBuscando] = useState(false);
 
+  const getAuth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('queen_token')}` } });
+
   useEffect(() => {
     const authHeader = { headers: { Authorization: `Bearer ${localStorage.getItem('queen_token')}` } };
     if (!cliente) return;
@@ -81,13 +83,13 @@ export default function MinhaConta() {
     }
     try {
       if (isEditing) {
-        await axios.patch(`${API_URL}/api/cliente/enderecos/${formEndereco.id}`, formEndereco, authHeader);
+        await axios.patch(`${API_URL}/api/cliente/enderecos/${formEndereco.id}`, formEndereco, getAuth());
       } else {
-        await axios.post(`${API_URL}/api/cliente/enderecos`, formEndereco, authHeader);
+        await axios.post(`${API_URL}/api/cliente/enderecos`, formEndereco, getAuth());
       }
       setSuccessMsg('Endereço salvo com sucesso!');
       setShowForm(false);
-      const res = await axios.get(`${API_URL}/api/cliente/enderecos`, authHeader);
+      const res = await axios.get(`${API_URL}/api/cliente/enderecos`, getAuth());
       setEnderecos(res.data || []);
     } catch (err) {
       setErrorMsg(err.response?.data?.erro || 'Erro ao salvar endereço');
@@ -96,7 +98,7 @@ export default function MinhaConta() {
 
   const excluirEndereco = async (id) => {
     try {
-      await axios.delete(`${API_URL}/api/cliente/enderecos/${id}`, authHeader);
+      await axios.delete(`${API_URL}/api/cliente/enderecos/${id}`, getAuth());
       setEnderecos(prev => prev.filter(e => e.id !== id));
       setDeletandoEnd(null);
       setSuccessMsg('Endereço excluído!');
@@ -115,7 +117,7 @@ export default function MinhaConta() {
         whatsapp: whatsapp || undefined,
         senha: novaSenha || undefined,
         senha_confirm: confirmSenha || undefined
-      }, authHeader);
+      }, getAuth());
       setSuccessMsg('Cadastro atualizado com sucesso!');
       setNovaSenha(''); setConfirmSenha('');
     } catch (err) {
