@@ -1,9 +1,7 @@
 // src/pages/Admin/CadastrarProduto.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { useNavigate, Link } from 'react-router-dom';
-
-const API_URL = 'https://queen-store-api.onrender.com';
 
 export default function CadastrarProduto() {
   const navigate = useNavigate();
@@ -61,9 +59,7 @@ export default function CadastrarProduto() {
     imagensFiles.forEach(file => formData.append('imagens', file));
 
     try {
-      const response = await axios.post(`${API_URL}/api/produtos`, formData, {
-        headers: { 'x-session-id': 'admin-temp' }
-      });
+      const response = await api.post('/api/produtos', formData);
 
       setStatus('sucesso');
       console.log('Links das imagens:', response.data.imagens);

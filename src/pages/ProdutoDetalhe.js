@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
-import { useCarrinho } from '../App';
-import { useAuth } from '../context/AuthContext';  // ← ADICIONA ISSO PRA VERIFICAR LOGIN
-
-const API_URL = 'https://queen-store-api.onrender.com';
+import api from '../services/api';
+import { useCarrinho } from '../context/CarrinhoContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function ProdutoDetalhe() {
   const { id } = useParams();
@@ -16,7 +14,7 @@ export default function ProdutoDetalhe() {
   const { cliente } = useAuth();  // pra verificar se tá logado
 
   useEffect(() => {
-    axios.get(`${API_URL}/api/produtos`)
+    api.get('/api/produtos')
       .then(res => {
         const encontrado = res.data.find(p => p.id === parseInt(id));
         setProduto(encontrado || null);
@@ -47,7 +45,7 @@ export default function ProdutoDetalhe() {
     try {
       // Verifica se já tá salvo (simples, sem lista local por enquanto)
       // Quando tiver rota GET desejos, a gente adiciona verificação real
-      await axios.post(`${API_URL}/api/desejos`, { produto_id: produto.id });
+      await api.post('/api/desejos', { produto_id: produto.id });
       alert('Produto salvo nos desejos! 💜');
     } catch (err) {
       alert('Erro ao salvar desejo');

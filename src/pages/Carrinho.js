@@ -1,7 +1,7 @@
 // src/pages/Carrinho.jsx — VERSÃO FINAL COM INTEGRAÇÃO DE DADOS LOGADO + CONFIRMAÇÃO RÁPIDA
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useCarrinho } from '../App';
+import { useCarrinho } from '../context/CarrinhoContext';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 

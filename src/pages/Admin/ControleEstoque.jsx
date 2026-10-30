@@ -1,9 +1,7 @@
 // src/pages/Admin/ControleEstoque.jsx — EDIÇÃO COMPLETA DE PRODUTOS
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { Link } from 'react-router-dom';
-
-const API_URL = 'https://queen-store-api.onrender.com';
 
 export default function ControleEstoque() {
   const [produtos, setProdutos] = useState([]);
@@ -18,7 +16,7 @@ export default function ControleEstoque() {
 
   const carregarProdutos = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/produtos`);
+      const res = await api.get('/api/produtos');
       setProdutos(res.data);
       setLoading(false);
     } catch (err) {
@@ -41,7 +39,7 @@ export default function ControleEstoque() {
 
   const salvarEdicao = async (id) => {
     try {
-      await axios.patch(`${API_URL}/api/produtos/${id}`, form);
+      await api.patch(`/api/produtos/${id}`, form);
       setProdutos(prev => prev.map(p => p.id === editando ? { ...p, ...form } : p));
       setEditando(null);
       alert('Produto atualizado com sucesso!');
@@ -65,7 +63,7 @@ export default function ControleEstoque() {
 
   const deletarProduto = async (id) => {
     try {
-      await axios.delete(`${API_URL}/api/produtos/${id}`);
+      await api.delete(`/api/produtos/${id}`);
       setProdutos(prev => prev.filter(p => p.id !== id));
       setDeletando(null);
     } catch (err) {

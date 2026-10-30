@@ -1,9 +1,7 @@
 // src/pages/Admin/Pedidos.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { Link } from 'react-router-dom';
-
-const API_URL = 'https://queen-store-api.onrender.com';
 
 const STATUS_CONFIG = {
   pendente:  { label: 'PENDENTE',  bg: 'bg-yellow-500',  text: 'text-yellow-700',  light: 'bg-yellow-50'  },
@@ -24,7 +22,7 @@ export default function Pedidos() {
 
   const carregarPedidos = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/admin/pedidos`);
+      const res = await api.get('/api/admin/pedidos');
       setPedidos(res.data);
     } catch (err) {
       alert('Erro ao carregar pedidos');
@@ -47,7 +45,7 @@ export default function Pedidos() {
   const salvarEdicao = async (id) => {
     try {
       const itensArray = JSON.parse(form.itens || '[]');
-      await axios.patch(`${API_URL}/api/pedidos/${id}`, {
+      await api.patch(`/api/pedidos/${id}`, {
         cliente_nome: form.cliente_nome,
         cliente_whatsapp: form.cliente_whatsapp,
         itens: itensArray,
@@ -63,7 +61,7 @@ export default function Pedidos() {
 
   const atualizarStatus = async (id, status) => {
     try {
-      await axios.patch(`${API_URL}/api/pedidos/${id}`, { status });
+      await api.patch(`/api/pedidos/${id}`, { status });
       setConfirmando(null);
       carregarPedidos();
     } catch (err) {

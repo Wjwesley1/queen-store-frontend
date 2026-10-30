@@ -1,9 +1,7 @@
 // src/pages/Admin/AdminDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-const API_URL = 'https://queen-store-api.onrender.com';
+import api from '../../services/api';
 
 export default function AdminDashboard() {
   const [pedidosPendentes, setPedidosPendentes] = useState(0);
@@ -21,9 +19,9 @@ export default function AdminDashboard() {
     const carregarAlertas = async () => {
       try {
         const [res1, res2, res3] = await Promise.all([
-          axios.get(`${API_URL}/api/admin/pedidos-pendentes`),
-          axios.get(`${API_URL}/api/admin/estoque-baixo`),
-          axios.get(`${API_URL}/api/admin/faturamento-hoje`)
+          api.get('/api/admin/pedidos-pendentes'),
+          api.get('/api/admin/estoque-baixo'),
+          api.get('/api/admin/faturamento-hoje')
         ]);
         setPedidosPendentes(res1.data.total);
         setEstoqueBaixo(res2.data.total);
