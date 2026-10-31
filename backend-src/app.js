@@ -37,17 +37,22 @@ app.use(cors({
 app.use(express.json());
 
 // ==================== ROTAS RAIZ E HEALTH ====================
-app.get('/', (req, res) => {
+const statusHandler = (req, res) => {
   res.json({
     mensagem: 'Queen Store API IMORTAL',
     status: '100% NO AR',
     data: new Date().toLocaleString('pt-BR')
   });
-});
+};
 
-app.get('/health', (req, res) => {
+const healthHandler = (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toLocaleString('pt-BR') });
-});
+};
+
+app.get('/', statusHandler);
+app.get('/api', statusHandler);
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // ==================== MONTAGEM DAS ROTAS ====================
 app.use('/api', productRoutes);
