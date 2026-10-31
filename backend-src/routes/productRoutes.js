@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 const {
   getProdutos,
@@ -10,28 +10,28 @@ const {
   editarProduto,
   atualizarEstoque,
   deletarProduto,
-  getCategorias
-} = require('../controllers/productController');
+  getCategorias,
+} = require("../controllers/productController");
 
 // GET /api/categorias
-router.get('/categorias', getCategorias);
+router.get("/categorias", getCategorias);
 
 // GET /api/produtos
-router.get('/produtos', getProdutos);
+router.get("/produtos", getProdutos);
 
 // GET /api/produtos/:id
-router.get('/produtos/:id', getProdutoById);
+router.get("/produtos/:id", getProdutoById);
 
 // POST /api/produtos
-router.post('/produtos', upload.array('imagens', 4), cadastrarProduto);
+router.post("/produtos", upload.array("imagens", 4), cadastrarProduto);
 
 // PATCH /api/produtos/:id
-router.patch('/produtos/:id', editarProduto);
+router.patch("/produtos/:id", editarProduto);
 
 // PATCH /api/produtos/:id/estoque
-router.patch('/produtos/:id/estoque', atualizarEstoque);
+router.patch("/produtos/:id/estoque", atualizarEstoque);
 
 // DELETE /api/produtos/:id
-router.delete('/produtos/:id', deletarProduto);
+router.delete("/produtos/:id", deletarProduto);
 
 module.exports = router;

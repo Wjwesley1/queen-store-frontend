@@ -1,6 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import api from '../services/api';
-import { showNotification } from '../components/common/ToastNotification';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import api from "../services/api";
+import { showNotification } from "../components/common/ToastNotification";
 
 const CarrinhoContext = createContext();
 
@@ -10,8 +16,9 @@ export const CarrinhoProvider = ({ children }) => {
   const [carrinho, setCarrinho] = useState([]);
 
   const carregarCarrinho = useCallback(() => {
-    api.get('/api/carrinho')
-      .then(res => setCarrinho(res.data))
+    api
+      .get("/api/carrinho")
+      .then((res) => setCarrinho(res.data))
       .catch(() => setCarrinho([]));
   }, []);
 
@@ -21,15 +28,15 @@ export const CarrinhoProvider = ({ children }) => {
 
   const addToCart = async (produto, quantidade = 1) => {
     if (produto.estoque < quantidade) {
-      showNotification('Estoque insuficiente! 😔');
+      showNotification("Estoque insuficiente! 😔");
       return;
     }
     try {
-      await api.post('/api/carrinho', { produto_id: produto.id, quantidade });
+      await api.post("/api/carrinho", { produto_id: produto.id, quantidade });
       carregarCarrinho();
       showNotification(`${quantidade} × ${produto.nome} adicionado! 🛒`);
     } catch {
-      showNotification('Erro ao adicionar ao carrinho 😢');
+      showNotification("Erro ao adicionar ao carrinho 😢");
     }
   };
 
@@ -41,17 +48,21 @@ export const CarrinhoProvider = ({ children }) => {
   };
 
   const totalItens = carrinho.reduce((sum, i) => sum + i.quantidade, 0);
-  const totalValor = carrinho.reduce((sum, i) => sum + (i.preco * i.quantidade), 0).toFixed(2);
+  const totalValor = carrinho
+    .reduce((sum, i) => sum + i.preco * i.quantidade, 0)
+    .toFixed(2);
 
   return (
-    <CarrinhoContext.Provider value={{
-      carrinho,
-      addToCart,
-      removeFromCart,
-      carregarCarrinho,
-      totalItens,
-      totalValor
-    }}>
+    <CarrinhoContext.Provider
+      value={{
+        carrinho,
+        addToCart,
+        removeFromCart,
+        carregarCarrinho,
+        totalItens,
+        totalValor,
+      }}
+    >
       {children}
     </CarrinhoContext.Provider>
   );

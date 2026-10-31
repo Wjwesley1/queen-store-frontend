@@ -1,284 +1,52 @@
-/* src/index.css — QUEEN STORE COM SUAS CORES E ANIMAÇÃO */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* FONTES */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap');
-
-body {
-  @apply font-roboto bg-neutral text-primary;
-}
-
-/* CONTAINER */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-/* BOTÕES */
-.btn-primary {
-  @apply bg-primary text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-secondary transition transform hover:scale-105;
-}
-
-.btn-secondary {
-  @apply bg-white text-primary border-2 border-primary font-bold py-3 px-6 rounded-full shadow-lg hover:bg-primary hover:text-white transition transform hover:scale-105;
-}
-
-.btn-add-cart {
-  @apply bg-primary text-white font-medium py-2 px-4 rounded-full text-sm hover:bg-secondary transition;
-}
-
-.filter-btn {
-  @apply px-6 py-2 rounded-full font-medium transition;
-}
-.filter-btn.active {
-  @apply bg-primary text-white;
-}
-.filter-btn:not(.active) {
-  @apply bg-white text-primary border border-primary hover:bg-primary hover:text-white;
-}
-
-/* HEADER */
-header {
-  @apply sticky top-0 z-50 bg-white shadow-md border-b border-gray-200;
-}
-.brand h1 {
-  @apply text-3xl md:text-4xl font-helo text-primary;
-}
-.tagline {
-  @apply text-xs uppercase tracking-widest text-secondary font-roboto;
-}
-
-/* HERO */
-.hero {
-  @apply py-20 bg-gradient-to-br from-neutral to-white relative overflow-hidden;
-}
-.hero h2 {
-  @apply text-5xl md:text-6xl font-helo text-primary mb-6 leading-tight;
-}
-.hero p {
-  @apply text-lg text-secondary mb-8 font-roboto;
-}
-.hero-soap-display {
-  @apply relative h-96 rounded-3xl overflow-hidden bg-gradient-to-br from-primary/10 to-secondary/10 shadow-2xl;
-}
-.floating-soap {
-  @apply absolute text-white font-bold text-sm px-4 py-2 rounded-full shadow-lg animate-floating;
-}
-.soap-1 { @apply bg-primary top-8 left-8; animation-delay: 0s; }
-.soap-2 { @apply bg-secondary top-20 right-12; animation-delay: 1s; }
-.soap-3 { @apply bg-accent bottom-16 left-16; animation-delay: 2s; }
-.soap-4 { @apply bg-primary/80 bottom-8 right-20; animation-delay: 3s; }
-
-/* PRODUTOS */
-.products-grid {
-  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8;
-}
-.product-card {
-  @apply bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-2 border border-gray-100;
-}
-.product-image {
-  @apply h-64 bg-gray-100 relative;
-}
-.product-badge {
-  @apply absolute top-4 left-4 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full;
-}
-.product-info {
-  @apply p-6;
-}
-.product-title {
-  @apply text-xl font-helo text-primary mb-2;
-}
-.price-current {
-  @apply text-2xl font-bold text-primary;
-}
-.product-actions {
-  @apply flex justify-between items-center mt-4;
-}
-.product-rating {
-  @apply text-yellow-500 text-sm;
-}
-.rating-text {
-  @apply text-secondary text-xs;
-}
-
-/* AVALIAÇÕES */
-.reviews-grid {
-  @apply grid grid-cols-1 md:grid-cols-3 gap-8;
-}
-.review-card {
-  @apply bg-white p-6 rounded-2xl shadow-lg border border-gray-100;
-}
-.review-header {
-  @apply flex items-center gap-4 mb-4;
-}
-.reviewer-avatar {
-  @apply w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold text-lg;
-}
-.review-text {
-  @apply text-secondary italic font-roboto;
-}
-
-/* CONTATO */
-.form-container {
-  @apply bg-white p-8 rounded-2xl shadow-lg border border-gray-200;
-}
-.form-group {
-  @apply mb-4;
-}
-.form-group input,
-.form-group textarea {
-  @apply w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition font-roboto;
-}
-.form-group textarea {
-  @apply h-32 resize-none;
-}
-
-/* NOTIFICAÇÃO */
-.notification {
-  @apply fixed bottom-8 right-8 bg-primary text-white px-6 py-4 rounded-full shadow-2xl font-bold z-50;
-  animation: bounce 0.5s ease-out;
-}
-
-/* LOADING */
-.loading {
-  @apply text-center py-20 text-3xl font-helo text-primary animate-pulse;
-}
-
-/* RESPONSIVO */
-@media (max-width: 768px) {
-  .hero h2 {
-    @apply text-4xl;
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
-  .products-grid {
-    @apply grid-cols-1 sm:grid-cols-2;
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-gray-900 antialiased selection:bg-pink-100 selection:text-[#0F1B3F];
+    font-family: "Plus Jakarta Sans", Roboto, sans-serif;
   }
 }
 
-/* CONTADOR DE ESTOQUE AO VIVO */
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-/* FIX PRA CELULAR */
-* {
-  -webkit-tap-highlight-color: transparent;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-/* Grid de produtos perfeita no celular */
-.grid-produtos {
-  @apply grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4;
-}
-
-/* Cards no celular */
-.card-produto {
-  @apply relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:scale-105;
-}
-
-/* Carrinho no celular */
-.carrinho-mobile {
-  @apply fixed bottom-0 left-0 right-0 bg-white border-t-4 border-primary p-4 z-50;
-}
-
-/* Botão flutuante do WhatsApp */
-.whatsapp-float {
-  @apply fixed bottom-20 right-4 bg-green-500 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-3xl z-50 hover:scale-110 transition-all;
-}
-
-/* Ajustes pra tela pequena */
-@media (max-width: 640px) {
-  .container {
-    @apply px-3;
-  }
-  
-  h1 {
-    @apply text-3xl;
-  }
-  
-  .btn-add-cart {
-    @apply text-lg py-4;
-  }
-  
-  .product-badge {
-    @apply text-xs px-3 py-1;
-  }
-
-  @keyframes fade-in {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fade-in 1.5s ease-out forwards;
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
+/* Animações e utilitários personalizados */
+@keyframes floating {
+  0%,
+  100% {
     transform: translateY(0);
   }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
+.animate-floating {
+  animation: floating 3s ease-in-out infinite;
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 1.2s ease-out forwards;
-}
-
-.delay-300 {
-  animation-delay: 300ms;
-}
-
-}
-
-/* ANIMAÇÕES PERSONALIZADAS DA QUEEN */
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
+
 .animate-spin-slow {
   animation: spin-slow 4s linear infinite;
 }
 
-@keyframes loading-bar {
-  0% { width: 0%; }
-  50% { width: 70%; }
-  100% { width: 100%; }
-}
-.animate-loading-bar {
-  animation: loading-bar 3s ease-in-out infinite;
-}
-@keyframes loading-bar {
-  0% { width: 0%; }
-  60% { width: 85%; }
-  100% { width: 100%; }
-}
-.animate-loading-bar {
-  animation: loading-bar 2.5s ease-in-out infinite;
-}
-/* BARRA FLUÍDA LENTA E LUXUOSA — 5 SEGUNDOS */
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
@@ -292,7 +60,6 @@ html {
   animation: shimmer 5s ease-in-out infinite;
 }
 
-/* BRILHO LENTO E PODEROSO */
 @keyframes shine {
   0% {
     transform: translateX(-150%);
@@ -303,5 +70,21 @@ html {
 }
 
 .animate-shine {
-  animation: shine 5s ease-in-out infinite 0.8s; /* começa um pouco depois pra ficar mais bonito */
+  animation: shine 5s ease-in-out infinite 0.8s;
+}
+
+@keyframes loading-bar {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-loading-bar {
+  animation: loading-bar 2.5s ease-in-out infinite;
 }

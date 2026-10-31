@@ -1,30 +1,35 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 
-import Home from './pages/Home';
-import Favoritos from './pages/Favoritos';
-import Carrinho from './pages/Carrinho';
-import ProdutoDetalhe from './pages/ProdutoDetalhe';
-import Login from './pages/Login';
-import MinhaConta from './pages/MinhaConta';
-import VerifyAccount from './pages/VerifyAccount';
-import Privacidade from './pages/Privacidade';
-import Termos from './pages/Termos';
+import Home from "./pages/Home";
+import Favoritos from "./pages/Favoritos";
+import Carrinho from "./pages/Carrinho";
+import ProdutoDetalhe from "./pages/ProdutoDetalhe";
+import Login from "./pages/Login";
+import MinhaConta from "./pages/MinhaConta";
+import VerifyAccount from "./pages/VerifyAccount";
+import Privacidade from "./pages/Privacidade";
+import Termos from "./pages/Termos";
 
-import AdminLogin from './pages/Admin/AdminLogin';
-import AdminDashboard from './pages/Admin/AdminDashboard';
-import CadastrarProduto from './pages/Admin/CadastrarProduto';
-import ControleEstoque from './pages/Admin/ControleEstoque';
-import Pedidos from './pages/Admin/Pedidos';
+import AdminLogin from "./pages/Admin/AdminLogin";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import CadastrarProduto from "./pages/Admin/CadastrarProduto";
+import ControleEstoque from "./pages/Admin/ControleEstoque";
+import Pedidos from "./pages/Admin/Pedidos";
 
-import { CarrinhoProvider } from './context/CarrinhoContext';
-import { FavoritosProvider } from './context/FavoritosContext';
-import useInactivityLogout from './hooks/useInactivityLogout';
+import { CarrinhoProvider } from "./context/CarrinhoContext";
+import { FavoritosProvider } from "./context/FavoritosContext";
+import useInactivityLogout from "./hooks/useInactivityLogout";
 
 function ScrollToHashElement() {
   const location = useLocation();
@@ -34,7 +39,7 @@ function ScrollToHashElement() {
       const id = location.hash.substring(1);
       setTimeout(() => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
+        if (el) el.scrollIntoView({ behavior: "smooth" });
       }, 300);
     }
   }, [location]);
@@ -66,8 +71,14 @@ function AppContent() {
               <Route path="/admin" element={<AdminLogin />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/cadastrar-produto" element={<CadastrarProduto />} />
-              <Route path="/admin/controle-estoque" element={<ControleEstoque />} />
+              <Route
+                path="/admin/cadastrar-produto"
+                element={<CadastrarProduto />}
+              />
+              <Route
+                path="/admin/controle-estoque"
+                element={<ControleEstoque />}
+              />
               <Route path="/admin/pedidos" element={<Pedidos />} />
             </Routes>
           </div>
@@ -79,7 +90,7 @@ function AppContent() {
 }
 
 export default function App() {
-  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || '';
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
 
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
