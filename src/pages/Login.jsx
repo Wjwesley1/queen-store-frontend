@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import api from "../services/api";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function Login() {
@@ -28,22 +28,16 @@ export default function Login() {
       if (isRegister) {
         if (form.senha !== form.senha_confirm)
           throw new Error("As senhas não coincidem!");
-        res = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/auth/register`,
-          {
-            nome: form.nome,
-            email: form.email,
-            senha: form.senha,
-          },
-        );
+        res = await api.post("/api/auth/register", {
+          nome: form.nome,
+          email: form.email,
+          senha: form.senha,
+        });
       } else {
-        res = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/auth/login`,
-          {
-            email: form.email,
-            senha: form.senha,
-          },
-        );
+        res = await api.post("/api/auth/login", {
+          email: form.email,
+          senha: form.senha,
+        });
       }
 
       login(res.data.token, res.data.cliente);
@@ -61,12 +55,9 @@ export default function Login() {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
-      const res = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/auth/google`,
-        {
-          token: credentialResponse.credential,
-        },
-      );
+      const res = await api.post("/api/auth/google", {
+        token: credentialResponse.credential,
+      });
       login(res.data.token, res.data.cliente);
       navigate("/minha-conta");
     } catch (err) {

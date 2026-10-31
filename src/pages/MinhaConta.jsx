@@ -1,10 +1,9 @@
 // src/pages/MinhaConta.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { Navigate, Link } from "react-router-dom";
-
-const API_URL = process.env.REACT_APP_API_URL || "";
 
 const STATUS_CONFIG = {
   pendente: { label: "PENDENTE", bg: "bg-yellow-500" },
@@ -37,32 +36,18 @@ export default function MinhaConta() {
   const [salvando, setSalvando] = useState(false);
   const [cepBuscando, setCepBuscando] = useState(false);
 
-  const getAuth = () => ({
-    headers: { Authorization: `Bearer ${localStorage.getItem("queen_token")}` },
-  });
-
   useEffect(() => {
-    const authHeader = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("queen_token")}`,
-      },
-    };
     if (!cliente) return;
-    axios
-      .get(`${API_URL}/api/clientes/pedidos`, authHeader)
+    api
+      .get("/api/clientes/pedidos")
       .then((res) => setPedidos(res.data))
       .catch(() => {});
   }, [cliente]);
 
   useEffect(() => {
-    const authHeader = {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("queen_token")}`,
-      },
-    };
     if (openEndereco && cliente) {
-      axios
-        .get(`${API_URL}/api/cliente/enderecos`, authHeader)
+      api
+        .get("/api/cliente/enderecos")
         .then((res) => setEnderecos(res.data || []))
         .catch(() => {});
     }
@@ -103,24 +88,16 @@ export default function MinhaConta() {
     }
     try {
       if (isEditing) {
-        await axios.patch(
-          `${API_URL}/api/cliente/enderecos/${formEndereco.id}`,
+        await api.patch(
+          `/api/cliente/enderecos/${formEndereco.id}`,
           formEndereco,
-          getAuth(),
         );
       } else {
-        await axios.post(
-          `${API_URL}/api/cliente/enderecos`,
-          formEndereco,
-          getAuth(),
-        );
+        await api.post("/api/cliente/enderecos", formEndereco);
       }
       setSuccessMsg("Endereço salvo com sucesso!");
       setShowForm(false);
-      const res = await axios.get(
-        `${API_URL}/api/cliente/enderecos`,
-        getAuth(),
-      );
+      const res = await api.get("/api/cliente/enderecos");
       setEnderecos(res.data || []);
     } catch (err) {
       setErrorMsg(err.response?.data?.erro || "Erro ao salvar endereço");
@@ -129,7 +106,7 @@ export default function MinhaConta() {
 
   const excluirEndereco = async (id) => {
     try {
-      await axios.delete(`${API_URL}/api/cliente/enderecos/${id}`, getAuth());
+      await api.delete(`/api/cliente/enderecos/${id}`);
       setEnderecos((prev) => prev.filter((e) => e.id !== id));
       setDeletandoEnd(null);
       setSuccessMsg("Endereço excluído!");
@@ -151,15 +128,11 @@ export default function MinhaConta() {
     }
     setSalvando(true);
     try {
-      await axios.patch(
-        `${API_URL}/api/clientes/atualizar`,
-        {
-          whatsapp: whatsapp || undefined,
-          senha: novaSenha || undefined,
-          senha_confirm: confirmSenha || undefined,
-        },
-        getAuth(),
-      );
+      await api.patch("/api/clientes/atualizar", {
+        whatsapp: whatsapp || undefined,
+        senha: novaSenha || undefined,
+        senha_confirm: confirmSenha || undefined,
+      });
       setSuccessMsg("Cadastro atualizado com sucesso!");
       setNovaSenha("");
       setConfirmSenha("");
