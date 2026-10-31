@@ -8,7 +8,7 @@ const getProdutos = async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error("Erro ao carregar produtos:", err);
-    res.status(500).json({ erro: "Erro no servidor" });
+    res.status(500).json({ erro: "Erro no servidor", detalhe: err.message });
   }
 };
 
@@ -22,7 +22,7 @@ const getProdutoById = async (req, res) => {
       return res.status(404).json({ erro: "Produto não encontrado" });
     res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ erro: "Erro no servidor" });
+    res.status(500).json({ erro: "Erro no servidor", detalhe: err.message });
   }
 };
 
@@ -175,7 +175,8 @@ const getCategorias = async (req, res) => {
     `);
     res.json(result.rows.map((row) => row.categoria));
   } catch (err) {
-    res.status(500).json({ erro: "Erro no servidor" });
+    console.error("Erro ao carregar categorias:", err);
+    res.status(500).json({ erro: "Erro no servidor", detalhe: err.message });
   }
 };
 

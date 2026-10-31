@@ -26,7 +26,9 @@ const getCarrinho = async (req, res) => {
     res.json(itens);
   } catch (err) {
     console.error("Erro ao carregar carrinho:", err);
-    res.status(500).json({ erro: "Erro ao carregar carrinho" });
+    res
+      .status(500)
+      .json({ erro: "Erro ao carregar carrinho", detalhe: err.message });
   }
 };
 

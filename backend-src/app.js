@@ -1,5 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const pool = require("./config/db");
 
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
@@ -54,8 +56,32 @@ const statusHandler = (req, res) => {
   });
 };
 
-const healthHandler = (req, res) => {
-  res.json({ status: "OK", timestamp: new Date().toLocaleString("pt-BR") });
+const healthHandler = async (req, res) => {
+  const hasDbUrl = Boolean(process.env.DATABASE_URL);
+  if (!hasDbUrl) {
+    return res.status(500).json({
+      status: "ERRO",
+      motivo: "DATABASE_URL não configurada no painel da Vercel",
+      timestamp: new Date().toLocaleString("pt-BR"),
+    });
+  }
+
+  try {
+    const result = await pool.query("SELECT NOW()");
+    res.json({
+      status: "OK",
+      banco: "conectado",
+      hora_banco: result.rows[0].now,
+      timestamp: new Date().toLocaleString("pt-BR"),
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "ERRO",
+      motivo: "Falha ao conectar no PostgreSQL",
+      erro: err.message,
+      timestamp: new Date().toLocaleString("pt-BR"),
+    });
+  }
 };
 
 app.get("/", statusHandler);
